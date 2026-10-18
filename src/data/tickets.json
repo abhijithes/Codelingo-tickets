@@ -1,539 +1,687 @@
 {
   "batches": [
     {
-      "id": "week-one",
-      "label": "Week One",
-      "title": "Week One Build Plan",
-      "source": "../CodeLingo/public/tickets-dev.html",
-      "intro": "<p><strong>The order matters less than the dependencies.</strong> Tickets 1, 2, 3, 5, 6 and 7 don't depend on anything else — start any of those on day one. Ticket 4 needs 1 and 2 finished first. Ticket 8 needs 7. Ticket 9 needs 1. Ticket 10 is last — it's the one that connects everything to the real backend instead of placeholder data.</p>\n      <p>Each ticket below has the same shape: <strong>what you're building</strong> in plain language, <strong>why it exists</strong>, then the technical spec — files, implementation notes, a definition of done, and a command or step to prove it works.</p>\n      <p>Tick the checkbox on a ticket once it's done. Your progress is saved on this device.</p>"
-    },
-    {
-      "id": "batch-two",
-      "label": "Batch Two",
-      "title": "Batch Two Build Plan",
-      "source": "../CodeLingo/public/CodeLingo — Batch Two Build Plan.html",
-      "intro": "<p><strong>Pairs:</strong> 11 with 16, 12 with 17, 13 with 18, 14 with 19, 15 with 20. Frontend can start immediately against the planned responses and switch to the real API when its backend partner is done. <strong>Do 11 first</strong>, since nothing runs without the database.</p><p>Each ticket says what you will see working, then the files, the approach, a definition of done and a check. Tick a box when finished; progress saves on this device.</p>"
+      "id": "mobile",
+      "label": "Mobile",
+      "title": "Mobile App Build Plan",
+      "source": "CodeLingo Mobile Tickets.html",
+      "intro": "Everything needed to rebuild the CodeLingo web app on mobile against the same backend. Each ticket says what to build, which API calls it uses, which web code can be copied, and how to know it is finished.\n<h2>Before you start</h2>\n    <div class=\"callouts\">\n      <div class=\"callout\">\n        <h3>The API address changes on a phone</h3>\n        <p>The web app calls <code>http://localhost:3000</code>. On a real phone, use your computer's local network IP. On the Android emulator, use <code>10.0.2.2:3000</code>. Keep it in one env variable (MOB-2).</p>\n      </div>\n      <div class=\"callout\">\n        <h3>Four response shapes are guesses</h3>\n        <p>The web code guesses the responses of <code>/auth/register</code>, <code>/auth/me</code>, <code>/me/onboarding</code> and <code>/diagnostic/result</code>. Call them once in Postman or read the backend repo, then write the real shapes into MOB-2.</p>\n      </div>\n      <div class=\"callout\">\n        <h3>Lessons, XP and editor do not exist yet</h3>\n        <p>The web app has no lessons, practice, XP, logout or profile-update endpoints. Those tickets are in the Blocked group at the bottom. Do not start them yet.</p>\n      </div>\n    </div>\n<h2>Backend reference</h2>\n    <p>The 8 endpoints the web app uses today. All base URL <code>http://localhost:3000</code>. Auth is a Bearer token in the <code>Authorization</code> header. No cookies.</p>\n    <div class=\"tablebox\">\n      <table>\n        <thead><tr><th>Endpoint</th><th>Auth</th><th>Request</th><th>Response used by the UI</th></tr></thead>\n        <tbody>\n          <tr><td><span class=\"verb\">POST</span><span class=\"m\">/auth/login</span></td><td>No</td><td class=\"m\">{ email, password }</td><td>Only <code>token</code> is read.</td></tr>\n          <tr><td><span class=\"verb\">POST</span><span class=\"m\">/auth/register</span></td><td>No</td><td class=\"m\">{ name, email, password }</td><td>Ignored on success. On error, <code>message</code> is shown.</td></tr>\n          <tr><td><span class=\"verb\">GET</span><span class=\"m\">/auth/me</span></td><td>Yes</td><td>None</td><td><code>data.user ?? data</code> with <code>name</code>, <code>email</code>, <code>language</code>.</td></tr>\n          <tr><td><span class=\"verb\">POST</span><span class=\"m\">/me/onboarding</span></td><td>Yes</td><td class=\"m\">{ occupation, experienceLevel, language }</td><td>Ignored. Enums: occupation STUDENT, PROFESSIONAL, HOBBYIST. experienceLevel STUDENT, BEGINNER, SOME_EXPERIENCE, EXPERIENCED. language PYTHON, JAVA, JAVASCRIPT.</td></tr>\n          <tr><td><span class=\"verb\">GET</span><span class=\"m\">/diagnostic/questions</span></td><td>Yes</td><td>None</td><td><code>{ questions: [{ id, conceptSlug, difficulty, prompt, options[] }] }</code></td></tr>\n          <tr><td><span class=\"verb\">POST</span><span class=\"m\">/diagnostic/submit</span></td><td>Yes</td><td class=\"m\">{ answers: [{ questionId, selectedOptionIndex }] }</td><td><code>score, totalQuestions, percentage, level, review, startingSyllabusLevel {id,title}|null, breakdown{slug:{correct,total}}</code>. Level is BEGINNER, ELEMENTARY, INTERMEDIATE or ADVANCED.</td></tr>\n          <tr><td><span class=\"verb\">GET</span><span class=\"m\">/diagnostic/result</span></td><td>Yes</td><td>None</td><td>Shape uncertain. The web code accepts <code>result ?? diagnostic ?? raw</code> with <code>score, scoreTotal, questionsAnswered, level, insight, concepts[{name, score 0-5, status}]</code>. 404, 204, 400 and 422 mean no diagnostic yet.</td></tr>\n          <tr><td><span class=\"verb\">GET</span><span class=\"m\">/api/syllabus</span></td><td>Token sent</td><td>None</td><td><code>Level[]</code> or <code>{ data: Level[] }</code>. Level has topics, topic has concepts.</td></tr>\n        </tbody>\n      </table>\n    </div>\n<h2>Suggested split for two people</h2>\n    <div class=\"split\">\n      <div class=\"callout\"><h3>Person A: foundation, then auth</h3><p>MOB-1 to MOB-6 first (do MOB-1 to 3 together in one sitting so the repo and API client are shared). Then MOB-7, MOB-8, MOB-9.</p></div>\n      <div class=\"callout\"><h3>Person B: the learning flow</h3><p>Once MOB-6 is merged: MOB-10, MOB-11, MOB-12. Then Syllabus (MOB-13) and Profile (MOB-14) once the diagnostic result is available.</p></div>\n      <div class=\"callout\"><h3>Together at the end</h3><p>MOB-15, the full walkthrough on a real device, and a short list of what the backend still needs for the Blocked tickets.</p></div>\n    </div>"
     }
   ],
   "tickets": [
     {
-      "id": "SYL-1",
-      "number": "01",
-      "batch": "week-one",
-      "title": "Syllabus tables and seed the Python syllabus",
-      "area": "Backend",
-      "group": "Backend",
-      "estimate": "4h",
+      "id": "MOB-1",
+      "number": "1",
+      "batch": "mobile",
+      "title": "Project setup",
+      "area": "Mobile",
+      "group": "Foundation",
+      "groupNote": "Setup that every other ticket depends on.",
+      "estimate": "S, ~½ day",
       "dependsOn": "none",
-      "summary": "Before a user can be \"placed\" into a syllabus, a syllabus has to exist in the database. This ticket builds the two tables that hold it: one for the big levels (Beginner, Elementary, Intermediate, Advanced) and one for the topics inside each level.",
-      "why": "Everything else this week — the diagnostic result, the results screen, the browse page — points at these rows. Build this first.",
-      "see": "",
-      "files": [
-        "<code>src/db/schema.ts</code>",
-        "<code>drizzle/</code> (auto-generated by the migration command)",
-        "<code>src/db/seed-syllabus.ts</code> (new)"
+      "blocked": false,
+      "summary": "Create the empty Expo app that everything else builds on. Do this first so both of you work from the same folder structure and the same package versions.",
+      "steps": [
+        "Run `npx create-expo-app codelingo-mobile --template blank-typescript`.",
+        "Install native packages: `npx expo install react-native-svg expo-secure-store @react-native-async-storage/async-storage react-native-screens react-native-safe-area-context`.",
+        "Install JS packages: `npm i axios @react-navigation/native @react-navigation/native-stack`.",
+        "Add ESLint and Prettier. Copy the rules from the web repo if it has them, so code style matches.",
+        "Create folders: `src/api`, `src/features/auth`, `src/features/onboarding`, `src/features/diagnostic`, `src/features/syllabus`, `src/features/profile`, `src/components`, `src/theme`, `src/assets`.",
+        "Push to a new Git repo and share it with your partner."
       ],
-      "how": "Add two tables. <code style=\"font-family:var(--mono);font-size:13px\">syllabus_levels</code>: id, order, title, description. <code style=\"font-family:var(--mono);font-size:13px\">syllabus_topics</code>: id, levelId (points at a level), order, title, blurb, conceptSlug. Seed four levels — Beginner, Elementary, Intermediate, Advanced — and spread your six existing concepts (variables-and-types, control-flow, functions, data-structures, oop, exception-handling) across them in a sensible order. Follow the same id and timestamp style already used elsewhere in the schema.",
+      "api": [],
+      "needs": "",
+      "reuse": [],
+      "notes": [
+        "Using Expo (managed) because it is the easiest to start with. If you prefer bare React Native, say so now, since later tickets assume Expo packages."
+      ],
       "dod": [
-        "The migration runs cleanly and both tables show up with data in them.",
-        "Every topic points at a level that actually exists.",
-        "Running the seed script twice doesn't create duplicate rows."
-      ],
-      "verify": "npm run db:migrate && npm run db:seed:syllabus && npm run db:studio",
-      "links": []
+        "`npx expo start` runs and the app opens on an emulator or the Expo Go app.",
+        "A placeholder screen renders with no TypeScript or lint errors.",
+        "The folder structure above exists and is committed."
+      ]
     },
     {
-      "id": "SYL-2",
-      "number": "02",
-      "batch": "week-one",
-      "title": "Diagnostic question bank: schema and 15 seeded questions",
-      "area": "Backend",
-      "group": "Backend",
-      "estimate": "3h",
-      "dependsOn": "none",
-      "summary": "This is the actual 15-question test. It's written by hand and stored in the database — not generated live — so the test never breaks because an AI service is slow or down.",
-      "why": "A test that depends on a third-party API to even load is a fragile thing to demo in front of an examiner. This one doesn't.",
-      "see": "",
-      "files": [
-        "<code>src/db/schema.ts</code>",
-        "<code>src/db/seed-diagnostic.ts</code> (new)"
+      "id": "MOB-2",
+      "number": "2",
+      "batch": "mobile",
+      "title": "Shared API client",
+      "area": "Mobile",
+      "group": "Foundation",
+      "groupNote": "Setup that every other ticket depends on.",
+      "estimate": "M, ~1 day",
+      "dependsOn": "MOB-1, MOB-3",
+      "blocked": false,
+      "summary": "The web app repeats the base URL in 8 places across 6 files and has no shared HTTP layer. On mobile, build one client first so every screen calls the backend the same way and a bad token is handled in one place.",
+      "steps": [
+        "Create `src/api/client.ts` with one axios instance. Base URL comes from `process.env.EXPO_PUBLIC_API_URL`. Add `.env` (git-ignored) and `.env.example`.",
+        "Request interceptor: read the token from the storage module (MOB-3) and set `Authorization: Bearer <token>` when one exists.",
+        "Response interceptor: on a 401, clear the token and call a registered `onUnauthorized` callback. The callback is set by the auth gate in MOB-6 and sends the user to Login.",
+        "Do NOT run the 401 logic for `/auth/login` and `/auth/register`. A wrong password is probably a 401 and must show an error on the form, not log the user out.",
+        "Write one typed function per endpoint in `src/api/`: `login`, `register`, `getMe`, `saveOnboarding`, `getDiagnosticQuestions`, `submitDiagnostic`, `getDiagnosticResult`, `getSyllabus`. Screens must call these, never axios directly.",
+        "Call the four uncertain endpoints once (register, me, onboarding, diagnostic/result) and write the real response shapes as TypeScript types in the same files."
       ],
-      "how": "One table, <code style=\"font-family:var(--mono);font-size:13px\">diagnostic_questions</code>: id, conceptSlug, difficulty, prompt, options (a list of 4 choices), correctOptionIndex, explanation. Write 15 multiple-choice questions spread across the six concepts — two or three questions per concept, mixing easy and harder ones. Code-writing questions can come later; keep this batch to multiple choice so it's fast to build and fast to grade.",
+      "api": [
+        {
+          "method": "POST",
+          "path": "/auth/login",
+          "note": "body { email, password }, reads token"
+        },
+        {
+          "method": "POST",
+          "path": "/auth/register",
+          "note": "body { name, email, password }"
+        },
+        {
+          "method": "GET",
+          "path": "/auth/me",
+          "note": "returns data.user ?? data"
+        },
+        {
+          "method": "POST",
+          "path": "/me/onboarding",
+          "note": "body { occupation, experienceLevel, language }"
+        },
+        {
+          "method": "GET",
+          "path": "/diagnostic/questions",
+          "note": ""
+        },
+        {
+          "method": "POST",
+          "path": "/diagnostic/submit",
+          "note": "body { answers[] }"
+        },
+        {
+          "method": "GET",
+          "path": "/diagnostic/result",
+          "note": "404/204/400/422 mean no result yet"
+        },
+        {
+          "method": "GET",
+          "path": "/api/syllabus",
+          "note": "Level[] or { data: Level[] }"
+        }
+      ],
+      "needs": "",
+      "reuse": [],
+      "notes": [
+        "Phone testing: use your computer's LAN IP (for example `http://192.168.1.20:3000`). Android emulator: `http://10.0.2.2:3000`. The backend must listen on all interfaces, not only localhost.",
+        "React Native is not affected by CORS, so the backend does not need changes for that. Ask the backend owner to confirm it does not depend on cookies or an Origin check."
+      ],
       "dod": [
-        "Exactly 15 questions are seeded.",
-        "Every correctOptionIndex points at a real option (0 to 3).",
-        "Every one of the six concepts has at least one question."
-      ],
-      "verify": "npm run db:seed:diagnostic && npm run db:studio",
-      "links": []
+        "No file outside `src/api` contains a URL or imports axios.",
+        "The base URL is read from `EXPO_PUBLIC_API_URL` and the README lists the variable.",
+        "A 401 on any other endpoint clears the token and returns to Login.",
+        "All 8 endpoint functions exist with typed requests and responses."
+      ]
     },
     {
-      "id": "SYL-3",
-      "number": "03",
-      "batch": "week-one",
-      "title": "Extend onboarding: occupation, experience, language",
-      "area": "Backend",
-      "group": "Backend",
-      "estimate": "2h",
-      "dependsOn": "none",
-      "summary": "Before the diagnostic test starts, the app asks a user what they do, how experienced they are, and what they want to learn. This ticket is the backend side: where those three answers get saved.",
-      "why": "The frontend screens in ticket 6 need somewhere real to send this data. Build the landing spot first so that work isn't blocked.",
-      "see": "",
-      "files": [
-        "<code>src/db/schema.ts</code> (users table, or a new user_profile table)",
-        "<code>src/controllers/meController.ts</code>",
-        "<code>src/routes/meRoutes.ts</code>"
+      "id": "MOB-3",
+      "number": "3",
+      "batch": "mobile",
+      "title": "Token and local storage",
+      "area": "Mobile",
+      "group": "Foundation",
+      "groupNote": "Setup that every other ticket depends on.",
+      "estimate": "S, ~½ day",
+      "dependsOn": "MOB-1",
+      "blocked": false,
+      "summary": "The web app keeps the token and some cached data in `localStorage`. Mobile has no `localStorage`, so build one small storage module that replaces it.",
+      "steps": [
+        "Create `src/storage/auth-storage.ts` with `getToken`, `setToken`, `clearToken`, using `expo-secure-store` (key `token`).",
+        "Keep an in-memory copy of the token so the axios interceptor does not wait on disk for every request.",
+        "Create `src/storage/diagnostic-storage.ts` with `getDiagnosticResult`, `setDiagnosticResult`, `clearDiagnosticResult` using AsyncStorage (key `diagnostic_result`, stored as JSON).",
+        "Wrap reads in try/catch and return null on failure."
       ],
-      "how": "Add three fields: occupation (plain text), experienceLevel (a fixed set of options — for example Student, Beginner, Some Experience, Experienced), and language (already exists as an enum — for now the only accepted value is Python). Extend the existing <code style=\"font-family:var(--mono);font-size:13px\">POST /me/onboarding</code> endpoint to accept and save all three at once.",
+      "api": [],
+      "needs": "",
+      "reuse": [
+        "Web keys: `token`, `diagnostic_result`. Do not port `codelingo_profile`. That key only stored profile edits locally and was never sent to the server."
+      ],
+      "notes": [],
       "dod": [
-        "Sending all three fields saves them, and fetching the current user shows them back.",
-        "Sending an invalid experience level or a non-Python language is rejected with a clear error."
-      ],
-      "verify": "curl -X POST :3000/me/onboarding \\ -H \"Authorization: Bearer $TOKEN\" -H \"Content-Type: application/json\" \\ -d '{\"occupation\":\"student\",\"experienceLevel\":\"BEGINNER\",\"language\":\"PYTHON\"}'",
-      "links": []
+        "After closing and reopening the app, the token and diagnostic result are still there.",
+        "`clearToken` also clears the in-memory copy.",
+        "No other file touches SecureStore or AsyncStorage directly."
+      ]
     },
     {
-      "id": "SYL-4",
-      "number": "04",
-      "batch": "week-one",
-      "title": "Diagnostic endpoints: serve, grade, and place",
-      "area": "Backend",
-      "group": "Backend",
-      "estimate": "5h",
-      "dependsOn": "01, 02",
-      "summary": "This is the engine room. One endpoint hands out all 15 questions. Another accepts the user's answers all at once, grades them, works out a level, writes it to the database, and tells the frontend where in the syllabus to start.",
-      "why": "Everything the user sees on the results screen and the syllabus page comes out of this one ticket.",
-      "see": "",
-      "files": [
-        "<code>src/routes/diagnosticRoutes.ts</code> (new)",
-        "<code>src/controllers/diagnosticController.ts</code> (new)",
-        "<code>src/services/placementService.ts</code> (new)"
+      "id": "MOB-4",
+      "number": "4",
+      "batch": "mobile",
+      "title": "Theme and assets",
+      "area": "Mobile",
+      "group": "Foundation",
+      "groupNote": "Setup that every other ticket depends on.",
+      "estimate": "S, ~½ day",
+      "dependsOn": "MOB-1",
+      "blocked": false,
+      "summary": "Give both of you the same colors, spacing and mascot images so screens look like the web app without copying CSS.",
+      "steps": [
+        "Create `src/theme/theme.ts` exporting colors, spacing, radii and font sizes.",
+        "Colors from the web app: bg `#09070f`, surface `#0d0a14`, border `#292335`, accent `#8c4ff2`, accent dark `#7438d8`, text `#aaa2bd`, strong text `#f7f4ff`. Primary buttons use a purple gradient from purple-500 to purple-600, which needs `expo-linear-gradient`.",
+        "Fonts: the web app uses system fonts (Avenir Next, Segoe UI). Use the platform default font in React Native, or bundle one font with `expo-font` if you want a custom look.",
+        "Copy the mascot PNGs from web `src/assets/characters/` (happy, hi, excited, confused, crying, sad, thinking, celebrating, strugling) and `src/assets/hero.png` into `src/assets/`.",
+        "Make a small `Mascot` component that takes a mood name and renders the right image with `require()`."
       ],
-      "how": "<code style=\"font-family:var(--mono);font-size:13px\">GET /diagnostic/questions</code> returns all 15 questions — never the correct answers. <code style=\"font-family:var(--mono);font-size:13px\">POST /diagnostic/submit</code> takes the user's answers, grades them against the stored answer key, works out a score out of 15, and picks a level from that score (for example: under 40% Beginner, under 60% Elementary, under 80% Intermediate, otherwise Advanced). It saves an attempt row and calls the AI review service from ticket 5 to write the review text — if that call fails, it must still return a result using the fallback review, never an error. The response includes the score, the level, the review text, which syllabus level to start at, and a breakdown by concept.",
+      "api": [],
+      "needs": "",
+      "reuse": [],
+      "notes": [],
       "dod": [
-        "The questions endpoint returns exactly 15 questions with no answer key visible.",
-        "A perfect score lands on the top level; a zero score lands on the bottom one.",
-        "The suggested starting syllabus level always points at a real row.",
-        "Submitting still works and returns a result even if the AI service is unreachable."
-      ],
-      "verify": "curl :3000/diagnostic/questions -H \"Authorization: Bearer $TOKEN\" # then answer them and post to /diagnostic/submit, try both a strong # and a weak set of answers, and try it with the AI key removed",
-      "links": []
+        "A demo screen shows every mascot image on the dark background.",
+        "All screens read colors from the theme file. No hex values inside screen files.",
+        "The spelling `strugling` is kept in the file name only. The component prop can be `struggling`."
+      ]
     },
     {
-      "id": "SYL-5",
-      "number": "05",
-      "batch": "week-one",
-      "title": "AI review service, with a fallback that never fails",
-      "area": "Backend",
-      "group": "Backend",
-      "estimate": "4h",
-      "dependsOn": "none",
-      "summary": "This writes the two or three sentences of feedback the user reads after the test — something like \"you're strong in functions, work on exception handling.\" It's a separate piece from ticket 4 so it can be tested on its own before it's wired in.",
-      "why": "Free-tier AI APIs get rate-limited or slow sometimes. If this ticket only had the AI path, one bad API response could sink a live demo. The fallback text is not a nice-to-have — treat it as equally important as the AI path.",
-      "see": "",
-      "files": [
-        "<code>src/services/reviewService.ts</code> (new)",
-        "<code>.env.example</code>"
+      "id": "MOB-5",
+      "number": "5",
+      "batch": "mobile",
+      "title": "Port shared types and pure helpers",
+      "area": "Mobile",
+      "group": "Foundation",
+      "groupNote": "Setup that every other ticket depends on.",
+      "estimate": "M, ~1 day",
+      "dependsOn": "MOB-1",
+      "blocked": false,
+      "summary": "A lot of the web logic is plain TypeScript with no DOM, so it can be copied and reused. Doing this once saves rewriting the normalizers and validation.",
+      "steps": [
+        "Copy `src/features/diagnostic/types.ts` (DiagnosticSubmitResponse, DiagnosticLevel, DiagnosticBreakdown).",
+        "Copy `src/features/syllabus/types.ts` (SyllabusLevel, SyllabusTopic, SyllabusConcept, DiagnosticLikeResult).",
+        "Copy the normalizers from `src/features/syllabus/api/get-syllabus.ts`: `normalizeLevel`, `normalizeTopic`, `normalizeConcept`, `extractLevels`. Leave out the axios call and the `localStorage` read, since MOB-2 replaces those.",
+        "Extract from `profile-page.tsx` into their own file: `normalizeDiagnosis`, `normalizeConceptStatus`, `getInitials`, `radarAxisOrder`.",
+        "Copy `validate()` from `register-page.tsx`, and the helpers `normalizeComparableValue`, `formatLevelLabel`, `formatConceptLabel`, `getTopicGlyph`, `languageOptions`.",
+        "Copy `src/mocks/onboarding-data.ts` (all onboarding steps and options)."
       ],
-      "how": "One function, <code style=\"font-family:var(--mono);font-size:13px\">generateReview(score, breakdown, level)</code>. It calls whichever free-tier AI provider you're using, asking for a short 2-3 sentence review that names one concept the user did well on and one they should practice, based on the breakdown. Give the call a short timeout (5-8 seconds). If it errors, times out, or the key isn't set, fall back to a template built directly from the breakdown data — for example \"You're strongest in {topConcept} and could use more practice with {weakConcept}.\" That fallback path has to work with zero network calls.",
+      "api": [],
+      "needs": "",
+      "reuse": [],
+      "notes": [],
       "dod": [
-        "With a working API key, the review mentions a real concept from the breakdown.",
-        "With the key removed or invalid, a review still comes back — no crash, no empty response."
-      ],
-      "verify": "// call generateReview() directly with a sample breakdown, // once with a valid key and once with the key blanked out",
-      "links": []
+        "All copied files compile with no DOM or `window` references.",
+        "Each helper has one quick unit test or a sample call that proves it works (for example, `getInitials('Ada Lovelace')`).",
+        "No file imports from `react-dom` or TanStack Router."
+      ]
     },
     {
-      "id": "SYL-6",
-      "number": "06",
-      "batch": "week-one",
-      "title": "Onboarding: the personal-question screens",
-      "area": "Frontend",
-      "group": "Frontend",
-      "estimate": "4h",
-      "dependsOn": "none to start",
-      "summary": "Right after signup, before the test, the user answers a couple of quick questions about themselves: what they do, how much coding experience they have, and what they want to learn.",
-      "why": "This is the user's first real impression of the product after login — it should feel quick and friendly, not like filling out a form.",
-      "see": "",
-      "files": [
-        "<code>src/features/onboarding/components/onboarding-page.tsx</code>"
+      "id": "MOB-6",
+      "number": "6",
+      "batch": "mobile",
+      "title": "Navigation and auth gate",
+      "area": "Mobile",
+      "group": "Foundation",
+      "groupNote": "Setup that every other ticket depends on.",
+      "estimate": "M, ~1 day",
+      "dependsOn": "MOB-2, MOB-3, MOB-4",
+      "blocked": false,
+      "summary": "The web app has no route guard. Every page checks `localStorage` itself, and the syllabus page is not protected. On mobile, decide once at startup which set of screens the user can see.",
+      "steps": [
+        "Create an `AuthProvider` with status `loading`, `signedOut` or `signedIn`. On startup it reads the token from storage (MOB-3).",
+        "While `loading`, show a simple splash screen with the mascot.",
+        "Create two native-stack navigators. Signed out: Login, Register. Signed in: Onboarding, Diagnostic, DiagnosticResults, Syllabus, Profile.",
+        "Expose `signIn(token)` and `signOut()` from the provider. `signOut` clears the token and the saved diagnostic result.",
+        "Register the provider's `signOut` as the `onUnauthorized` callback from MOB-2.",
+        "Define a typed param list so DiagnosticResults receives the result object as a route param."
       ],
-      "how": "Add two new screens before the existing language-pick step: one for occupation (a short pick-list is friendlier than a text box — student, professional, hobbyist), one for experience level (a set of selectable cards). Keep the mascot and progress-dot style already used on the other onboarding screens. Hold all the answers in local state and send them together in one request when the user hits \"Start\" at the end — don't build a separate network call for each screen.",
+      "api": [],
+      "needs": "",
+      "reuse": [],
+      "notes": [
+        "The web app passes the diagnostic result through router history state, with `localStorage` as a fallback. On mobile, pass it as a route param and also save it with MOB-3, so it survives a restart."
+      ],
       "dod": [
-        "Every new screen renders and stops the user from continuing until it's answered.",
-        "The final submit sends occupation, experience level, and language together, in one request."
-      ],
-      "verify": "npm run dev # walk through onboarding in the browser, check the Network tab # for a single request carrying all three answers",
-      "links": []
+        "A logged-out user cannot open any signed-in screen.",
+        "A logged-in user opening the app skips Login.",
+        "Forcing a 401 (delete the token on the server or edit it) sends the user back to Login.",
+        "Navigation params are typed."
+      ]
     },
     {
-      "id": "SYL-7",
-      "number": "07",
-      "batch": "week-one",
-      "title": "The 15-question diagnostic player",
-      "area": "Frontend",
-      "group": "Frontend",
-      "estimate": "5h",
-      "dependsOn": "none to start",
-      "summary": "The actual test screen. It shows one question at a time out of 15, with a visible sense of progress, and only sends everything to the server once, at the very end.",
-      "why": "This is the screen the user spends the most time on. It should feel calm and clear — no surprises about how many questions are left.",
-      "see": "",
-      "files": [
-        "<code>src/features/diagnostic/</code> (new folder — components, mock data)",
-        "<code>src/routes/diagnostic.tsx</code> (new)"
+      "id": "MOB-7",
+      "number": "7",
+      "batch": "mobile",
+      "title": "Login screen",
+      "area": "Mobile",
+      "group": "Auth",
+      "groupNote": "Register, log in, stay logged in, log out.",
+      "estimate": "M, ~1 day",
+      "dependsOn": "MOB-6",
+      "blocked": false,
+      "summary": "Entry point for returning users. Matches the web login page without the dead social buttons.",
+      "steps": [
+        "Fields: email (email keyboard, no auto-capitalize) and password (secure text entry).",
+        "On submit call `login` from MOB-2 with `{ email, password }`.",
+        "Read `res.data.token`, store it through `signIn(token)`, then continue to the next screen (see MOB-9 for where).",
+        "On failure show the message `Login failed`. Show the server's `message` if it sends one.",
+        "Disable the button and show a spinner while the request runs.",
+        "Add a link to Register."
       ],
-      "how": "Start with a small set of mock questions so this can be built before the backend endpoint (ticket 4) is ready — swap the mock for the real API call in ticket 10. Show one question at a time, a progress indicator like \"6 of 15\", and collect every answer in local state as the user goes. Only send everything to the server in one batch when they finish the last question, rather than a network call after each answer.",
+      "api": [
+        {
+          "method": "POST",
+          "path": "/auth/login",
+          "note": "body { email, password }"
+        }
+      ],
+      "needs": "",
+      "reuse": [],
+      "notes": [
+        "The web login page shows GitHub and Google buttons that do nothing. Leave them out. They are tracked as MOB-B1."
+      ],
       "dod": [
-        "All 15 questions display in order with a visible progress indicator.",
-        "The final submit sends every answer in a single request."
-      ],
-      "verify": "npm run dev # walk through all 15 questions in the browser",
-      "links": []
+        "A valid login stores the token and leaves the Login screen.",
+        "A wrong password shows an error and keeps the user on Login (no logout loop).",
+        "Double tapping the button sends only one request.",
+        "The keyboard does not cover the form on a small phone."
+      ]
     },
     {
-      "id": "SYL-8",
-      "number": "08",
-      "batch": "week-one",
-      "title": "The results and review screen",
-      "area": "Frontend",
-      "group": "Frontend",
-      "estimate": "3h",
-      "dependsOn": "07",
-      "summary": "Right after the test, the user sees their score, their assigned level, the AI-written review, and a button that drops them into the syllabus at the right starting point.",
-      "why": "This is the payoff moment — where \"I just answered some questions\" turns into \"here's what I should learn next.\" Worth making it feel a little rewarding.",
-      "see": "",
-      "files": [
-        "<code>src/features/diagnostic/components/results-page.tsx</code> (new)"
+      "id": "MOB-8",
+      "number": "8",
+      "batch": "mobile",
+      "title": "Register screen",
+      "area": "Mobile",
+      "group": "Auth",
+      "groupNote": "Register, log in, stay logged in, log out.",
+      "estimate": "M, ~1 day",
+      "dependsOn": "MOB-6",
+      "blocked": false,
+      "summary": "Lets a new user create an account. Reuses the web validation rules.",
+      "steps": [
+        "Fields: name, email, password.",
+        "Use the ported `validate()` from MOB-5: name and email required, password at least 8 characters. Show errors under each field.",
+        "Trim values before sending, as the web app does.",
+        "On submit call `register` with `{ name, email, password }`.",
+        "On failure show `response.data.message` if present, otherwise `Registration failed.`",
+        "On success show a short toast or banner (not a browser-style alert) and navigate to Login."
       ],
-      "how": "Show the score, a level badge, the review text, and a simple per-concept breakdown (reuse whatever chip or list styling already exists on the profile page). One \"Start learning\" button that takes the user into the syllabus browse page, pre-selecting the level the test recommended.",
+      "api": [
+        {
+          "method": "POST",
+          "path": "/auth/register",
+          "note": "body { name, email, password }"
+        }
+      ],
+      "needs": "",
+      "reuse": [],
+      "notes": [
+        "The web app does not log the user in after registering. You can add that later if the register response includes a token, but confirm the response shape first."
+      ],
       "dod": [
-        "Every field from the submit response is visible on screen.",
-        "The button lands on the syllabus page with the right level pre-selected."
-      ],
-      "verify": "// finish a diagnostic run and confirm this screen matches // exactly what /diagnostic/submit returned",
-      "links": []
+        "Each validation rule shows an error on the right field.",
+        "A server error (for example duplicate email) is shown.",
+        "A success message appears and the user lands on Login."
+      ]
     },
     {
-      "id": "SYL-9",
-      "number": "09",
-      "batch": "week-one",
-      "title": "Syllabus browse page",
-      "area": "Frontend",
-      "group": "Frontend",
-      "estimate": "4h",
-      "dependsOn": "01",
-      "summary": "The diagnostic result is a starting point, not a cage — the user should be able to look at every level of the syllabus, not just the one they were placed into.",
-      "why": "People learn at different speeds. Locking someone to exactly one level would feel restrictive and isn't what was asked for.",
-      "see": "",
-      "files": [
-        "<code>src/features/syllabus/</code> (new folder)",
-        "<code>src/routes/syllabus.tsx</code> (new)"
+      "id": "MOB-9",
+      "number": "9",
+      "batch": "mobile",
+      "title": "After-login routing and logout",
+      "area": "Mobile",
+      "group": "Auth",
+      "groupNote": "Register, log in, stay logged in, log out.",
+      "estimate": "M, ~1 day",
+      "dependsOn": "MOB-7, MOB-11",
+      "blocked": false,
+      "summary": "The web app always sends users to Onboarding after login, even returning users, and has no logout at all. Mobile needs a sensible route after login and a way to sign out.",
+      "steps": [
+        "Ask the backend owner whether the user object from `/auth/me` says if onboarding or the diagnostic is done. If yes, use that to choose the screen.",
+        "If the backend cannot say, use this fallback after login: call `getDiagnosticResult`. If a result comes back, go to Syllabus. If it returns 404, 204, 400 or 422, go to Onboarding.",
+        "Add a Logout button on the Profile screen (and anywhere else you see fit) that calls `signOut()`.",
+        "Confirm logout clears the token and the saved diagnostic result, and returns to Login with no back button to signed-in screens."
       ],
-      "how": "List every syllabus level with its topics underneath. Mark the user's recommended starting level with a small \"Recommended start\" badge, but keep every other level clickable and open too. Clicking a level expands its list of topics.",
+      "api": [],
+      "needs": "",
+      "reuse": [],
+      "notes": [
+        "The fallback is a suggestion that uses only existing endpoints. It is not how the web app behaves today."
+      ],
       "dod": [
-        "All levels and their topics load and display from the database.",
-        "The recommended level is visually marked but nothing else is locked or disabled."
-      ],
-      "verify": "// browse the page as a user who has already completed the diagnostic",
-      "links": []
+        "A brand new user goes Register, Login, Onboarding, Diagnostic.",
+        "A returning user who finished the diagnostic lands on Syllabus.",
+        "Logout works and cannot be undone with the Android back button."
+      ]
     },
     {
-      "id": "SYL-10",
+      "id": "MOB-10",
       "number": "10",
-      "batch": "week-one",
-      "title": "Wire onboarding, diagnostic, and results to the real backend",
-      "area": "Frontend",
-      "group": "Frontend",
-      "estimate": "3h",
-      "dependsOn": "03, 04, 06, 07, 08",
-      "summary": "The last step: swap every piece of mock data built in tickets 6, 7, and 8 for real calls to the backend endpoints built in tickets 3 and 4.",
-      "why": "This is the ticket that turns five separate working pieces into one working product. Do it last, once the backend tickets have actually landed.",
-      "see": "",
-      "files": [
-        "Same files touched in tickets 06, 07, and 08"
+      "batch": "mobile",
+      "title": "Onboarding flow",
+      "area": "Mobile",
+      "group": "Onboarding and diagnostic",
+      "groupNote": "The path a new user takes before seeing the syllabus.",
+      "estimate": "L, ~2+ days",
+      "dependsOn": "MOB-5, MOB-6",
+      "blocked": false,
+      "summary": "Seven steps that collect the user's background and chosen language before the diagnostic.",
+      "steps": [
+        "Build the flow from the copied `onboarding-data.ts`: welcome, mascot messages, three question screens, then the ready screen.",
+        "Show step dots at the top and a mascot with a speech bubble on message steps.",
+        "Question screens show option cards. Continue stays disabled until one option is chosen.",
+        "Java and JavaScript options show a Coming soon chip and cannot be selected. Only Python works.",
+        "On the final step, call `saveOnboarding` once with `{ occupation, experienceLevel, language }`.",
+        "On failure, show an inline message that it could not be saved and let the user tap again to retry.",
+        "On success, navigate to the Diagnostic screen."
       ],
-      "how": "Replace every mock function call with the matching real API call from the contract defined in ticket 4. Use the existing shared API client and error-message pattern for loading and error states — don't invent a new one.",
+      "api": [
+        {
+          "method": "POST",
+          "path": "/me/onboarding",
+          "note": "occupation: STUDENT | PROFESSIONAL | HOBBYIST. experienceLevel: STUDENT | BEGINNER | SOME_EXPERIENCE | EXPERIENCED. language: PYTHON | JAVA | JAVASCRIPT."
+        }
+      ],
+      "needs": "",
+      "reuse": [],
+      "notes": [],
       "dod": [
-        "A brand-new registration can walk the whole path — onboarding, diagnostic, results, syllabus — with no mock data left anywhere in it."
-      ],
-      "verify": "// register a fresh account and walk the entire flow start to finish",
-      "links": []
+        "The request body uses exactly the allowed enum values.",
+        "Back moves to the previous step and keeps earlier answers.",
+        "A failed save can be retried without losing answers.",
+        "Coming soon options are visibly disabled."
+      ]
     },
     {
-      "id": "SYL-11",
+      "id": "MOB-11",
       "number": "11",
-      "batch": "batch-two",
-      "title": "Get the backend running: database, migrations, seeds",
-      "area": "Backend",
-      "group": "Backend",
-      "estimate": "2h",
-      "dependsOn": "none",
-      "summary": "Nothing can be demoed until the backend talks to a real database. This ticket gets it working.",
-      "why": "",
-      "see": "Register and login work for real, and the API returns the diagnostic questions and the full syllabus.",
-      "files": [
-        "<code>.env</code>",
-        "<code>src/db/ (migrations and seed scripts)</code>"
+      "batch": "mobile",
+      "title": "Diagnostic quiz",
+      "area": "Mobile",
+      "group": "Onboarding and diagnostic",
+      "groupNote": "The path a new user takes before seeing the syllabus.",
+      "estimate": "L, ~2+ days",
+      "dependsOn": "MOB-10",
+      "blocked": false,
+      "summary": "A 15-question placement quiz, one question at a time. The backend grades it and picks a level, so the app only collects answers and shows the response.",
+      "steps": [
+        "On open, call `getDiagnosticQuestions`. Show a loading state.",
+        "Show one question at a time: prompt, options as radio rows, a progress bar, and Back, Next and Finish buttons.",
+        "Keep answers in local state as an array in question order.",
+        "Finish is disabled until all 15 questions have an answer.",
+        "On Finish, call `submitDiagnostic` with `{ answers: [{ questionId, selectedOptionIndex }] }` in question order.",
+        "On success, save the result with MOB-3 and navigate to DiagnosticResults with the result as a param.",
+        "On network failure when loading, show an error screen with a Retry button that re-runs the request. On an empty list show No diagnostic questions.",
+        "On submit failure, show an inline error and keep all answers filled in."
       ],
-      "how": "Copy the correct connection string from your Supabase dashboard and URL-encode special characters in the password (@ becomes %40). Run the migrations and both seed scripts. Set your AI key and test one real AI review. Push both repos so your teammate has the same code.",
+      "api": [
+        {
+          "method": "GET",
+          "path": "/diagnostic/questions",
+          "note": "returns { questions: [{ id, conceptSlug, difficulty, prompt, options[] }] }"
+        },
+        {
+          "method": "POST",
+          "path": "/diagnostic/submit",
+          "note": "returns score, totalQuestions, percentage, level, review, startingSyllabusLevel, breakdown"
+        }
+      ],
+      "needs": "",
+      "reuse": [],
+      "notes": [
+        "Do not use `window.location.reload()` for Retry like the web app. Just call the fetch again."
+      ],
       "dod": [
-        "Registering a new user works.",
-        "A diagnostic submit returns an AI review.",
-        "The syllabus endpoint returns all 4 levels."
-      ],
-      "verify": "curl register, login, /diagnostic/questions and /api/syllabus",
-      "links": []
+        "All 15 questions can be answered, changed with Back, and submitted.",
+        "Retry works for both the load error and the submit error.",
+        "Answer order sent to the server matches question order.",
+        "Closing and reopening the app after submit still shows the saved result."
+      ]
     },
     {
-      "id": "SYL-12",
+      "id": "MOB-12",
       "number": "12",
-      "batch": "batch-two",
-      "title": "Make results match the syllabus, plus a latest-result endpoint",
-      "area": "Backend",
-      "group": "Backend",
-      "estimate": "3h",
-      "dependsOn": "SYL-11",
-      "summary": "The diagnostic questions use concept names that don't exist in the syllabus, so results can't link to lessons. This lines them up and adds the endpoints the profile needs.",
-      "why": "",
-      "see": "The results breakdown shows real syllabus concept names, and the profile page can load the user&#x27;s latest diagnostic.",
-      "files": [
-        "<code>src/db/seed-diagnostic.ts</code>",
-        "<code>diagnosticController.ts</code>",
-        "<code>meController.ts</code>"
+      "batch": "mobile",
+      "title": "Diagnostic results screen",
+      "area": "Mobile",
+      "group": "Onboarding and diagnostic",
+      "groupNote": "The path a new user takes before seeing the syllabus.",
+      "estimate": "M, ~1 day",
+      "dependsOn": "MOB-11",
+      "blocked": false,
+      "summary": "Shows the user how they did and where they will start. No API call: it renders the result from MOB-11.",
+      "steps": [
+        "Read the result from route params. If missing, read it from storage (MOB-3). If still missing, show an empty state with a button back to the diagnostic.",
+        "Score hero: `score` out of `totalQuestions` and `percentage`.",
+        "Level badge from `level` using `formatLevelLabel`.",
+        "AI review block showing the `review` text.",
+        "Concept breakdown list from `breakdown`: one row per concept slug with `correct / total`, labeled with `formatConceptLabel`.",
+        "A Start Learning button that goes to Syllabus."
       ],
-      "how": "Rewrite the seed so every question&#x27;s concept_slug matches a syllabus concept, and make it safe to run twice. Keep 20 questions in the bank but serve exactly 15. Add GET /diagnostic/result (latest attempt, or 404 if none) and PATCH /me for name and language. Make /me return xp and streakCount.",
+      "api": [],
+      "needs": "",
+      "reuse": [],
+      "notes": [],
       "dod": [
-        "Every diagnostic slug exists in the syllabus.",
-        "Running the seed twice doesn&#x27;t duplicate rows.",
-        "/diagnostic/result matches the last submit."
-      ],
-      "verify": "curl /diagnostic/result after finishing a diagnostic",
-      "links": [
-        "SYL-11"
+        "The screen renders correctly from params and from saved storage.",
+        "Long review text scrolls and does not get cut off.",
+        "The empty state appears when no result exists."
       ]
     },
     {
-      "id": "SYL-13",
+      "id": "MOB-13",
       "number": "13",
-      "batch": "batch-two",
-      "title": "Lesson endpoint: AI-written lessons, saved and reused",
-      "area": "Backend",
-      "group": "Backend",
-      "estimate": "4h",
-      "dependsOn": "SYL-11",
-      "summary": "Writing 160 lessons by hand isn't realistic. The AI writes each lesson the first time someone opens it, and the result is saved so it's instant afterwards.",
-      "why": "",
-      "see": "Opening any concept returns a short lesson with an explanation, a Python example and a common mistake.",
-      "files": [
-        "<code>schema.ts (lesson_content table)</code>",
-        "<code>services/lessonService.ts (new)</code>",
-        "<code>GET /concepts/:id/lesson</code>"
+      "batch": "mobile",
+      "title": "Syllabus browser",
+      "area": "Mobile",
+      "group": "Syllabus and profile",
+      "groupNote": "The two screens a user lands on after the diagnostic.",
+      "estimate": "L, ~2+ days",
+      "dependsOn": "MOB-5, MOB-12",
+      "blocked": false,
+      "summary": "The home screen after the diagnostic: levels, topics and concepts, with the user's recommended level marked.",
+      "steps": [
+        "On open, call `getSyllabus`. The response is either `Level[]` or `{ data: Level[] }`, so use the ported `extractLevels` and normalizers.",
+        "Show levels as a horizontal tab strip. Under it, show the topic list for the selected level, then the concept detail for the selected topic. Select the first topic by default.",
+        "Mark the recommended level with a star. First try to match `startingSyllabusLevel.id` from the diagnostic result to a level id. If that finds nothing, use the web fallback: lowercase and strip punctuation, compare the diagnostic level against each level's name, title, description and id, and finally fall back to the first level.",
+        "Add loading, an error screen with Retry, and an empty state: No syllabus content yet.",
+        "Show a Start button on topics and concepts only if it does something. Today it does nothing on the web, so hide or disable it until lessons exist (MOB-B3).",
+        "Use a bottom tab bar or simple header links for Syllabus and Profile. Leave out the decorative web sidebar items (Practice, Projects, Ranks) until those features exist."
       ],
-      "how": "Store one lesson per concept. If it exists, return it. Otherwise ask the AI service for a short lesson and save it. If the AI fails, return a simple lesson built from the concept&#x27;s description without saving it, so a later visit can retry.",
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/syllabus",
+          "note": "Level[] or { data: Level[] }"
+        }
+      ],
+      "needs": "",
+      "reuse": [],
+      "notes": [
+        "The web app matches the recommended level by comparing text, which breaks if the backend changes a title. Prefer the id match and keep the text match only as a fallback."
+      ],
       "dod": [
-        "The first request generates and saves a lesson.",
-        "The second request is instant.",
-        "With the key removed, a readable lesson still returns."
-      ],
-      "verify": "Call the lesson endpoint twice, then once with the AI key removed",
-      "links": [
-        "SYL-11"
+        "Switching levels and topics updates the lists without a new request.",
+        "The correct level is starred for each diagnostic level.",
+        "Retry works after a network failure.",
+        "No button on the screen does nothing when tapped."
       ]
     },
     {
-      "id": "SYL-14",
+      "id": "MOB-14",
       "number": "14",
-      "batch": "batch-two",
-      "title": "Progress, XP and streak endpoints",
-      "area": "Backend",
-      "group": "Backend",
-      "estimate": "4h",
-      "dependsOn": "SYL-11",
-      "summary": "Remembers which concepts each user has finished and rewards them.",
-      "why": "",
-      "see": "Completing a concept raises the user&#x27;s XP and streak, and progress counts show per topic and per level.",
-      "files": [
-        "<code>schema.ts (user_concept_progress table)</code>",
-        "<code>progressRoutes.ts and progressController.ts (new)</code>"
+      "batch": "mobile",
+      "title": "Profile screen",
+      "area": "Mobile",
+      "group": "Syllabus and profile",
+      "groupNote": "The two screens a user lands on after the diagnostic.",
+      "estimate": "L, ~2+ days",
+      "dependsOn": "MOB-5, MOB-9",
+      "blocked": false,
+      "summary": "Shows who the user is and how they did on the diagnostic, including the skill radar.",
+      "steps": [
+        "Call `getMe` (use `data.user ?? data`). Show avatar initials from `getInitials`, name, email and language.",
+        "Call `getDiagnosticResult`. A 404, 204, 400 or 422 means no diagnostic yet, so show a prompt to take it. Anything else that fails shows the same prompt.",
+        "Run the response through `normalizeDiagnosis`. Show the level, an insight banner and the concept breakdown with a status of Strong, Developing or Weak.",
+        "Draw the skill radar with `react-native-svg`: 6 fixed axes from `radarAxisOrder`, concept scores clamped from 0 to 5.",
+        "Show a Logout button (MOB-9).",
+        "Show the profile as read-only. Do not copy the web edit form."
       ],
-      "how": "One row per user and concept with a status of started or completed. POST /progress/concepts/:id/start, POST /progress/concepts/:id/complete (10 XP, and completing twice must not award XP twice) and GET /progress with completion per topic and level. Streak: add 1 if the last active day was yesterday, keep it if today, otherwise reset to 1.",
+      "api": [
+        {
+          "method": "GET",
+          "path": "/auth/me",
+          "note": "name, email, language"
+        },
+        {
+          "method": "GET",
+          "path": "/diagnostic/result",
+          "note": "shape uncertain, see MOB-2"
+        }
+      ],
+      "needs": "",
+      "reuse": [],
+      "notes": [
+        "The web app saves profile edits only to `localStorage`, never to the server. Do not copy that. Editing waits for a real `PATCH /me` (MOB-B2).",
+        "The web app shows a hardcoded `8 XP` badge. Leave it out until XP exists (MOB-B4)."
+      ],
       "dod": [
-        "Completing a concept twice awards XP once.",
-        "The streak behaves for today, yesterday and a gap.",
-        "GET /progress counts are correct."
-      ],
-      "verify": "Complete the same concept twice, then check xp on /me",
-      "links": [
-        "SYL-11"
+        "The no-diagnostic state and the has-diagnostic state both look correct.",
+        "The radar renders at phone width with all 6 labels visible.",
+        "A bad token returns the user to Login through the shared 401 handling."
       ]
     },
     {
-      "id": "SYL-15",
+      "id": "MOB-15",
       "number": "15",
-      "batch": "batch-two",
-      "title": "Practice quiz endpoints",
-      "area": "Backend",
-      "group": "Backend",
-      "estimate": "5h",
-      "dependsOn": "SYL-13, SYL-14",
-      "summary": "After reading a lesson, the user can test themselves. Questions are AI-generated and saved, with hand-written backups so the demo never breaks.",
-      "why": "",
-      "see": "Each concept has a 5-question practice quiz that is graded and awards bonus XP.",
-      "files": [
-        "<code>schema.ts (practice_questions table)</code>",
-        "<code>practiceRoutes.ts and practiceController.ts (new)</code>",
-        "<code>src/db/seed-practice.ts (new)</code>"
+      "batch": "mobile",
+      "title": "Walkthrough and README",
+      "area": "Mobile",
+      "group": "Wrap-up",
+      "groupNote": "Test everything together and leave good notes.",
+      "estimate": "S, ~½ day",
+      "dependsOn": "MOB-14",
+      "blocked": false,
+      "summary": "Prove the whole path works on a real device and leave notes so the project is easy to run again.",
+      "steps": [
+        "On one real phone or emulator, go through: register, login, onboarding, diagnostic, results, syllabus, profile, logout.",
+        "Also test: wrong password, killing the app and reopening, and turning off the network on a load screen.",
+        "Write a README with setup steps, the env variable `EXPO_PUBLIC_API_URL`, how to reach the backend from a phone, and the list of known gaps.",
+        "Write a short list of backend work still needed for the Blocked tickets and share it with the backend owner."
       ],
-      "how": "GET /concepts/:id/practice returns 5 multiple-choice questions without the answers. If none are saved, generate and save them with the AI. POST /concepts/:id/practice/submit grades on the server, returns the score with explanations, and awards 5 XP per correct answer. Hand-write 5 backup questions for about 6 concepts and use them if the AI fails.",
+      "api": [],
+      "needs": "",
+      "reuse": [],
+      "notes": [],
       "dod": [
-        "The questions endpoint never exposes correct answers.",
-        "A perfect score awards 25 XP.",
-        "With the AI key removed, the backup questions still return for the seeded concepts."
-      ],
-      "verify": "Fetch questions, submit answers, check the XP on /me",
-      "links": [
-        "SYL-13",
-        "SYL-14"
+        "Every step above works and any bug found has been fixed or written down.",
+        "A new person can run the app from the README alone."
       ]
     },
     {
-      "id": "SYL-16",
-      "number": "16",
-      "batch": "batch-two",
-      "title": "Register to onboarding flow and login routing",
-      "area": "Frontend",
-      "group": "Frontend",
-      "estimate": "3h",
-      "dependsOn": "SYL-11 for real data",
-      "summary": "Right now registering ends at a pop-up and users must find the login page themselves.",
-      "why": "",
-      "see": "Signing up drops the user straight into onboarding, real error messages show, and returning users skip the steps they&#x27;ve done.",
-      "files": [
-        "<code>src/lib/api.ts (new)</code>",
-        "<code>register-page.tsx</code>",
-        "<code>login-page.tsx</code>"
-      ],
-      "how": "Create one shared API file with the backend address in an environment variable, and use it in every page instead of the hardcoded address. On register: show the backend&#x27;s real error text, save the token, go to /onboarding. On login: check /me afterwards and go to onboarding, then the diagnostic, then the syllabus depending on what the user has finished.",
-      "dod": [
-        "A duplicate email shows Email already in use.",
-        "Register goes straight into onboarding.",
-        "A returning user lands on the syllabus."
-      ],
-      "verify": "Register a new user, log out, log in again",
-      "links": [
-        "SYL-11"
-      ]
+      "id": "MOB-B1",
+      "number": "B1",
+      "batch": "mobile",
+      "title": "Social login (GitHub and Google)",
+      "area": "Mobile",
+      "group": "Blocked",
+      "groupNote": "Do not start. These need backend work or do not exist on the web either.",
+      "estimate": "M, ~1 day",
+      "dependsOn": "none",
+      "blocked": true,
+      "summary": "The web login page shows these buttons with no handlers and no backend endpoints.",
+      "steps": [],
+      "api": [],
+      "needs": "OAuth start and callback endpoints on the backend, and a decision: native sign-in or a web-based flow.",
+      "reuse": [],
+      "notes": [],
+      "dod": []
     },
     {
-      "id": "SYL-17",
-      "number": "17",
-      "batch": "batch-two",
-      "title": "Profile page with real diagnostic data",
-      "area": "Frontend",
-      "group": "Frontend",
-      "estimate": "3h",
-      "dependsOn": "SYL-12",
-      "summary": "The profile page currently shows fake numbers.",
-      "why": "",
-      "see": "A skill radar, review and breakdown from the user&#x27;s own diagnostic, editable name and language that stick after refresh, and real XP and streak.",
-      "files": [
-        "<code>src/features/profile/</code>"
-      ],
-      "how": "Load /diagnostic/result for the radar, insight and breakdown. Save edits with PATCH /me instead of localStorage. Show real xp and streak. Remove language options the backend doesn&#x27;t support. Add a Retake diagnostic button.",
-      "dod": [
-        "The radar shows the user&#x27;s real scores.",
-        "An edited name survives a refresh.",
-        "No hardcoded XP remains."
-      ],
-      "verify": "Finish a diagnostic, open /profile, change the name, refresh",
-      "links": [
-        "SYL-12"
-      ]
+      "id": "MOB-B2",
+      "number": "B2",
+      "batch": "mobile",
+      "title": "Edit profile",
+      "area": "Mobile",
+      "group": "Blocked",
+      "groupNote": "Do not start. These need backend work or do not exist on the web either.",
+      "estimate": "M, ~1 day",
+      "dependsOn": "MOB-14",
+      "blocked": true,
+      "summary": "The web edit form saves only to local storage. The planned ticket expects a server update.",
+      "steps": [],
+      "api": [],
+      "needs": "A `PATCH /me` or `PUT /me` endpoint and a decision on which fields can be edited.",
+      "reuse": [],
+      "notes": [],
+      "dod": []
     },
     {
-      "id": "SYL-18",
-      "number": "18",
-      "batch": "batch-two",
-      "title": "Lesson page and live START buttons",
-      "area": "Frontend",
-      "group": "Frontend",
-      "estimate": "5h",
-      "dependsOn": "SYL-13",
-      "summary": "The START buttons on the syllabus do nothing yet.",
-      "why": "",
-      "see": "Clicking START or START TOPIC opens a readable lesson with a code example, and Next and Previous move through the topic.",
-      "files": [
-        "<code>src/features/lesson/ (new)</code>",
-        "<code>src/routes/lesson.$conceptId.tsx (new)</code>",
-        "<code>the syllabus page</code>"
-      ],
-      "how": "Wire the START buttons to the lesson page. Render the lesson text with proper code blocks. Add Previous and Next to walk the topic&#x27;s concepts in order. Show a loading message, because the first open generates the lesson and can take a few seconds.",
-      "dod": [
-        "START opens a real lesson.",
-        "Code examples display as code blocks.",
-        "Next and Previous follow the topic&#x27;s order."
-      ],
-      "verify": "Click START on a Beginner topic and walk through its concepts",
-      "links": [
-        "SYL-13"
-      ]
+      "id": "MOB-B3",
+      "number": "B3",
+      "batch": "mobile",
+      "title": "Lessons and exercises",
+      "area": "Mobile",
+      "group": "Blocked",
+      "groupNote": "Do not start. These need backend work or do not exist on the web either.",
+      "estimate": "L, ~2+ days",
+      "dependsOn": "MOB-13",
+      "blocked": true,
+      "summary": "The Start buttons in the syllabus do nothing on the web. No lesson or practice screens exist.",
+      "steps": [],
+      "api": [],
+      "needs": "Lesson and practice-quiz endpoints (web plan tickets SYL-11 to SYL-16, and SYL-18 for practice).",
+      "reuse": [],
+      "notes": [],
+      "dod": []
     },
     {
-      "id": "SYL-19",
-      "number": "19",
-      "batch": "batch-two",
-      "title": "Progress, XP header and working sidebar",
-      "area": "Frontend",
-      "group": "Frontend",
-      "estimate": "5h",
-      "dependsOn": "SYL-14, SYL-18",
-      "summary": "Makes progress visible, so the app feels alive.",
-      "why": "",
-      "see": "A Mark complete button on every lesson shows the XP gained, the syllabus shows 3/8 style counts, and an XP and streak bar appears at the top.",
-      "files": [
-        "<code>lesson page</code>",
-        "<code>syllabus page</code>",
-        "<code>shared sidebar component</code>"
-      ],
-      "how": "Add Mark complete to the lesson page that calls the complete endpoint and shows the XP earned. Use GET /progress to show completion on each topic and level and tick finished concepts. Add a header with xp and streak. Make LEARN and PROFILE real links, and mark PROJECTS and RANKS as Coming soon instead of leaving them silent.",
-      "dod": [
-        "XP and streak update right after completing.",
-        "Progress counts match what was finished.",
-        "No sidebar item does nothing silently."
-      ],
-      "verify": "Complete two concepts and watch the counts and XP change",
-      "links": [
-        "SYL-14",
-        "SYL-18"
-      ]
+      "id": "MOB-B4",
+      "number": "B4",
+      "batch": "mobile",
+      "title": "XP, streaks and leaderboard",
+      "area": "Mobile",
+      "group": "Blocked",
+      "groupNote": "Do not start. These need backend work or do not exist on the web either.",
+      "estimate": "L, ~2+ days",
+      "dependsOn": "MOB-B3",
+      "blocked": true,
+      "summary": "Only a hardcoded 8 XP badge exists on the web. There is no progress logic anywhere.",
+      "steps": [],
+      "api": [],
+      "needs": "Progress, XP and streak endpoints (web plan ticket SYL-14).",
+      "reuse": [],
+      "notes": [],
+      "dod": []
     },
     {
-      "id": "SYL-20",
-      "number": "20",
-      "batch": "batch-two",
-      "title": "Practice quiz screen",
-      "area": "Frontend",
-      "group": "Frontend",
-      "estimate": "4h",
-      "dependsOn": "SYL-15, SYL-18",
-      "summary": "The most demo-friendly screen: the user tests what they just learned.",
-      "why": "",
-      "see": "A Practice this concept button on each lesson opens a 5-question quiz, then a result screen with the score, explanations and the XP earned.",
-      "files": [
-        "<code>src/features/practice/ (new)</code>",
-        "<code>src/routes/practice.$conceptId.tsx (new)</code>"
-      ],
-      "how": "Reuse the one-question-at-a-time style from the diagnostic player. Fetch the questions, collect answers, submit once, then show the score, which answers were wrong with their explanations, and the bonus XP. Add a Back to lesson and a Next concept button.",
-      "dod": [
-        "The quiz opens from the lesson page.",
-        "The result shows score, explanations and XP.",
-        "XP in the header updates afterwards."
-      ],
-      "verify": "Finish a lesson, take its quiz, check the XP",
-      "links": [
-        "SYL-15",
-        "SYL-18"
-      ]
+      "id": "MOB-B5",
+      "number": "B5",
+      "batch": "mobile",
+      "title": "Code editor and code execution",
+      "area": "Mobile",
+      "group": "Blocked",
+      "groupNote": "Do not start. These need backend work or do not exist on the web either.",
+      "estimate": "L, ~2+ days",
+      "dependsOn": "MOB-B3",
+      "blocked": true,
+      "summary": "Nothing exists on the web: no editor, no sandbox, no run-code endpoint.",
+      "steps": [],
+      "api": [],
+      "needs": "A product decision on how code is written and checked, then a backend execution service. Mobile editor options differ from the web (Monaco does not run in React Native).",
+      "reuse": [],
+      "notes": [],
+      "dod": []
+    },
+    {
+      "id": "MOB-B6",
+      "number": "B6",
+      "batch": "mobile",
+      "title": "Token refresh, password reset, push notifications",
+      "area": "Mobile",
+      "group": "Blocked",
+      "groupNote": "Do not start. These need backend work or do not exist on the web either.",
+      "estimate": "L, ~2+ days",
+      "dependsOn": "none",
+      "blocked": true,
+      "summary": "The web app has no token expiry handling, no forgot-password flow and no notifications.",
+      "steps": [],
+      "api": [],
+      "needs": "Refresh token and password reset endpoints, plus device-token registration for push notifications.",
+      "reuse": [],
+      "notes": [],
+      "dod": []
     }
   ]
 }

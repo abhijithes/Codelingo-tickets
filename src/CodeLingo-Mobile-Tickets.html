@@ -1,0 +1,725 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CodeLingo Mobile Tickets</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column, sticky filter bar, expandable ticket cards grouped by epic. */
+:root {
+  --bg: #f6f4fb;
+  --surface: #ffffff;
+  --surface-2: #efebf8;
+  --line: #ddd6ee;
+  --fg: #1d1530;
+  --muted: #5f5678;
+  --accent: #6d2fd6;
+  --accent-ink: #ffffff;
+  --accent-soft: #ece3fc;
+  --good: #17703f;
+  --good-soft: #def3e7;
+  --warn: #8f5200;
+  --warn-soft: #fcefd5;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d0a16; --surface: #151024; --surface-2: #1d1630; --line: #2d2545;
+    --fg: #f1edfb; --muted: #a79fbf; --accent: #a77bf5; --accent-ink: #130a26;
+    --accent-soft: #251a40; --good: #5ad19a; --good-soft: #12291f;
+    --warn: #f0b45a; --warn-soft: #2b2112; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d0a16; --surface: #151024; --surface-2: #1d1630; --line: #2d2545;
+  --fg: #f1edfb; --muted: #a79fbf; --accent: #a77bf5; --accent-ink: #130a26;
+  --accent-soft: #251a40; --good: #5ad19a; --good-soft: #12291f;
+  --warn: #f0b45a; --warn-soft: #2b2112; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 56px;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--bg);
+}
+.wrap { max-width: 860px; margin: 0 auto; }
+code {
+  font-family: var(--font-mono); font-size: 0.86em;
+  background: var(--surface-2); border: 1px solid var(--line);
+  padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;
+}
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Header */
+header { padding-top: 40px; display: grid; gap: 14px; }
+.kicker {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent);
+}
+h1 {
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, 7vw, 52px);
+  line-height: 1.05; margin: 0; letter-spacing: -0.02em; text-wrap: balance;
+}
+.lede { color: var(--muted); max-width: 62ch; margin: 0; font-size: 16px; }
+.stack {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;
+}
+.chip {
+  font-family: var(--font-mono); font-size: 12px; padding: 3px 9px;
+  border: 1px solid var(--line); border-radius: 99px; background: var(--surface); color: var(--muted);
+}
+
+/* Sections */
+h2 {
+  font-family: var(--font-display); font-size: 24px; line-height: 1.2; margin: 0;
+  letter-spacing: -0.01em; text-wrap: balance;
+}
+.section { margin-top: 44px; display: grid; gap: 16px; }
+.section > p { margin: 0; color: var(--muted); max-width: 66ch; }
+
+.callouts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.callout {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 16px; display: grid; gap: 6px; align-content: start; min-width: 0;
+}
+.callout h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.callout p { margin: 0; color: var(--muted); font-size: 14px; }
+
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 13.5px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th {
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);
+  background: var(--surface-2); font-weight: 600;
+}
+tr:last-child td { border-bottom: 0; }
+.m { font-family: var(--font-mono); font-size: 12.5px; }
+.verb {
+  font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; padding: 1px 6px;
+  border-radius: 4px; background: var(--accent-soft); color: var(--accent); margin-right: 6px;
+}
+
+/* Toolbar */
+.toolbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  margin-top: 40px; padding-block: 12px; border-bottom: 1px solid var(--line);
+  display: grid; gap: 10px;
+}
+.toolrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+button {
+  font: inherit; font-size: 13px; cursor: pointer; color: var(--fg);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 99px; padding: 5px 12px;
+}
+button:hover { border-color: var(--accent); }
+button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.bar { width: 120px; height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; border: 1px solid var(--line); }
+.bar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width 0.25s; }
+.linkbtn { border-radius: 6px; padding: 4px 10px; }
+
+/* Epics and tickets */
+.epic { margin-top: 36px; display: grid; gap: 12px; }
+.epic-head { display: grid; gap: 2px; }
+.epic-head h2 { font-size: 21px; }
+.epic-head p { margin: 0; color: var(--muted); font-size: 14px; }
+
+details.ticket {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0;
+}
+details.ticket[open] > summary { border-bottom: 1px solid var(--line); }
+details.ticket.done { opacity: 0.72; }
+details.ticket.done .ttitle { text-decoration: line-through; text-decoration-thickness: 1px; }
+summary {
+  list-style: none; cursor: pointer; padding: 14px 16px; display: flex; flex-wrap: wrap;
+  gap: 6px 12px; align-items: baseline;
+}
+summary::-webkit-details-marker { display: none; }
+summary::after {
+  content: "+"; margin-left: auto; font-family: var(--font-mono); color: var(--muted); font-size: 18px; line-height: 1;
+}
+details[open] > summary::after { content: "\2212"; }
+.tid { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--accent); }
+.ttitle { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+.pill {
+  font-family: var(--font-mono); font-size: 11.5px; padding: 1px 8px; border-radius: 99px;
+  background: var(--surface-2); color: var(--muted); border: 1px solid var(--line);
+}
+.pill.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.pill.good { background: var(--good-soft); color: var(--good); border-color: transparent; }
+
+.body { padding: 16px; display: grid; gap: 18px; }
+.block { display: grid; gap: 6px; min-width: 0; }
+.block h4 {
+  margin: 0; font-size: 11.5px; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--muted); font-weight: 600;
+}
+.block p { margin: 0; max-width: 68ch; }
+.block ol, .block ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+.block ol { counter-reset: s; }
+.block ol li { counter-increment: s; padding-left: 28px; position: relative; max-width: 70ch; }
+.block ol li::before {
+  content: counter(s); position: absolute; left: 0; top: 1px; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+  font-size: 11.5px; font-family: var(--font-mono); display: grid; place-items: center;
+}
+.block ul.check li { padding-left: 26px; position: relative; max-width: 70ch; }
+.block ul.check li::before {
+  content: ""; position: absolute; left: 1px; top: 4px; width: 13px; height: 13px;
+  border: 1.5px solid var(--accent); border-radius: 3px;
+}
+.block ul.plain li { padding-left: 16px; position: relative; max-width: 70ch; }
+.block ul.plain li::before { content: ""; position: absolute; left: 3px; top: 10px; width: 5px; height: 5px; border-radius: 50%; background: var(--muted); }
+.block.warnbox { background: var(--warn-soft); border-radius: 8px; padding: 12px 14px; }
+.block.warnbox h4 { color: var(--warn); }
+.apis { display: grid; gap: 6px; }
+.apis div { font-size: 14px; }
+.foot {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+  padding-top: 12px; border-top: 1px dashed var(--line);
+}
+.donelabel { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.donelabel input { width: 17px; height: 17px; accent-color: var(--accent); }
+
+.split { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+@media (max-width: 520px) { summary { padding: 12px 14px; } .body { padding: 14px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">CodeLingo / mobile app</div>
+    <h1>React Native tickets</h1>
+    <p class="lede">Everything needed to rebuild the CodeLingo web app on mobile against the same backend. Each ticket says what to build, which API calls it uses, which web code can be copied, and how to know it is finished.</p>
+    <div class="stack" id="stack"></div>
+  </header>
+
+  <section class="section">
+    <h2>Before you start</h2>
+    <div class="callouts">
+      <div class="callout">
+        <h3>The API address changes on a phone</h3>
+        <p>The web app calls <code>http://localhost:3000</code>. On a real phone, use your computer's local network IP. On the Android emulator, use <code>10.0.2.2:3000</code>. Keep it in one env variable (MOB-2).</p>
+      </div>
+      <div class="callout">
+        <h3>Four response shapes are guesses</h3>
+        <p>The web code guesses the responses of <code>/auth/register</code>, <code>/auth/me</code>, <code>/me/onboarding</code> and <code>/diagnostic/result</code>. Call them once in Postman or read the backend repo, then write the real shapes into MOB-2.</p>
+      </div>
+      <div class="callout">
+        <h3>Lessons, XP and editor do not exist yet</h3>
+        <p>The web app has no lessons, practice, XP, logout or profile-update endpoints. Those tickets are in the Blocked group at the bottom. Do not start them yet.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Backend reference</h2>
+    <p>The 8 endpoints the web app uses today. All base URL <code>http://localhost:3000</code>. Auth is a Bearer token in the <code>Authorization</code> header. No cookies.</p>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Endpoint</th><th>Auth</th><th>Request</th><th>Response used by the UI</th></tr></thead>
+        <tbody>
+          <tr><td><span class="verb">POST</span><span class="m">/auth/login</span></td><td>No</td><td class="m">{ email, password }</td><td>Only <code>token</code> is read.</td></tr>
+          <tr><td><span class="verb">POST</span><span class="m">/auth/register</span></td><td>No</td><td class="m">{ name, email, password }</td><td>Ignored on success. On error, <code>message</code> is shown.</td></tr>
+          <tr><td><span class="verb">GET</span><span class="m">/auth/me</span></td><td>Yes</td><td>None</td><td><code>data.user ?? data</code> with <code>name</code>, <code>email</code>, <code>language</code>.</td></tr>
+          <tr><td><span class="verb">POST</span><span class="m">/me/onboarding</span></td><td>Yes</td><td class="m">{ occupation, experienceLevel, language }</td><td>Ignored. Enums: occupation STUDENT, PROFESSIONAL, HOBBYIST. experienceLevel STUDENT, BEGINNER, SOME_EXPERIENCE, EXPERIENCED. language PYTHON, JAVA, JAVASCRIPT.</td></tr>
+          <tr><td><span class="verb">GET</span><span class="m">/diagnostic/questions</span></td><td>Yes</td><td>None</td><td><code>{ questions: [{ id, conceptSlug, difficulty, prompt, options[] }] }</code></td></tr>
+          <tr><td><span class="verb">POST</span><span class="m">/diagnostic/submit</span></td><td>Yes</td><td class="m">{ answers: [{ questionId, selectedOptionIndex }] }</td><td><code>score, totalQuestions, percentage, level, review, startingSyllabusLevel {id,title}|null, breakdown{slug:{correct,total}}</code>. Level is BEGINNER, ELEMENTARY, INTERMEDIATE or ADVANCED.</td></tr>
+          <tr><td><span class="verb">GET</span><span class="m">/diagnostic/result</span></td><td>Yes</td><td>None</td><td>Shape uncertain. The web code accepts <code>result ?? diagnostic ?? raw</code> with <code>score, scoreTotal, questionsAnswered, level, insight, concepts[{name, score 0-5, status}]</code>. 404, 204, 400 and 422 mean no diagnostic yet.</td></tr>
+          <tr><td><span class="verb">GET</span><span class="m">/api/syllabus</span></td><td>Token sent</td><td>None</td><td><code>Level[]</code> or <code>{ data: Level[] }</code>. Level has topics, topic has concepts.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <div class="toolrow">
+      <div class="filters" id="filters" role="group" aria-label="Filter tickets by epic"></div>
+      <div class="progress"><span id="count">0 of 0 done</span><span class="bar"><i id="barfill"></i></span></div>
+    </div>
+    <div class="toolrow">
+      <span style="font-size:13px;color:var(--muted)">Tick Done on a ticket to track progress. It is saved in this browser only.</span>
+      <span><button class="linkbtn" id="expand" type="button">Expand all</button> <button class="linkbtn" id="collapse" type="button">Collapse all</button></span>
+    </div>
+  </div>
+
+  <main id="epics"></main>
+
+  <section class="section" id="split">
+    <h2>Suggested split for two people</h2>
+    <div class="split">
+      <div class="callout"><h3>Person A: foundation, then auth</h3><p>MOB-1 to MOB-6 first (do MOB-1 to 3 together in one sitting so the repo and API client are shared). Then MOB-7, MOB-8, MOB-9.</p></div>
+      <div class="callout"><h3>Person B: the learning flow</h3><p>Once MOB-6 is merged: MOB-10, MOB-11, MOB-12. Then Syllabus (MOB-13) and Profile (MOB-14) once the diagnostic result is available.</p></div>
+      <div class="callout"><h3>Together at the end</h3><p>MOB-15, the full walkthrough on a real device, and a short list of what the backend still needs for the Blocked tickets.</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+var EPICS = [
+  { id: "foundation", name: "Foundation", note: "Setup that every other ticket depends on." },
+  { id: "auth", name: "Auth", note: "Register, log in, stay logged in, log out." },
+  { id: "flow", name: "Onboarding and diagnostic", note: "The path a new user takes before seeing the syllabus." },
+  { id: "learn", name: "Syllabus and profile", note: "The two screens a user lands on after the diagnostic." },
+  { id: "wrap", name: "Wrap-up", note: "Test everything together and leave good notes." },
+  { id: "blocked", name: "Blocked", note: "Do not start. These need backend work or do not exist on the web either." }
+];
+
+var T = [
+{ id: "MOB-1", epic: "foundation", title: "Project setup", size: "S", deps: [],
+  why: "Create the empty Expo app that everything else builds on. Do this first so both of you work from the same folder structure and the same package versions.",
+  steps: [
+    "Run `npx create-expo-app codelingo-mobile --template blank-typescript`.",
+    "Install native packages: `npx expo install react-native-svg expo-secure-store @react-native-async-storage/async-storage react-native-screens react-native-safe-area-context`.",
+    "Install JS packages: `npm i axios @react-navigation/native @react-navigation/native-stack`.",
+    "Add ESLint and Prettier. Copy the rules from the web repo if it has them, so code style matches.",
+    "Create folders: `src/api`, `src/features/auth`, `src/features/onboarding`, `src/features/diagnostic`, `src/features/syllabus`, `src/features/profile`, `src/components`, `src/theme`, `src/assets`.",
+    "Push to a new Git repo and share it with your partner."
+  ],
+  accept: [
+    "`npx expo start` runs and the app opens on an emulator or the Expo Go app.",
+    "A placeholder screen renders with no TypeScript or lint errors.",
+    "The folder structure above exists and is committed."
+  ],
+  notes: ["Using Expo (managed) because it is the easiest to start with. If you prefer bare React Native, say so now, since later tickets assume Expo packages."]
+},
+{ id: "MOB-2", epic: "foundation", title: "Shared API client", size: "M", deps: ["MOB-1", "MOB-3"],
+  why: "The web app repeats the base URL in 8 places across 6 files and has no shared HTTP layer. On mobile, build one client first so every screen calls the backend the same way and a bad token is handled in one place.",
+  steps: [
+    "Create `src/api/client.ts` with one axios instance. Base URL comes from `process.env.EXPO_PUBLIC_API_URL`. Add `.env` (git-ignored) and `.env.example`.",
+    "Request interceptor: read the token from the storage module (MOB-3) and set `Authorization: Bearer <token>` when one exists.",
+    "Response interceptor: on a 401, clear the token and call a registered `onUnauthorized` callback. The callback is set by the auth gate in MOB-6 and sends the user to Login.",
+    "Do NOT run the 401 logic for `/auth/login` and `/auth/register`. A wrong password is probably a 401 and must show an error on the form, not log the user out.",
+    "Write one typed function per endpoint in `src/api/`: `login`, `register`, `getMe`, `saveOnboarding`, `getDiagnosticQuestions`, `submitDiagnostic`, `getDiagnosticResult`, `getSyllabus`. Screens must call these, never axios directly.",
+    "Call the four uncertain endpoints once (register, me, onboarding, diagnostic/result) and write the real response shapes as TypeScript types in the same files."
+  ],
+  api: [
+    ["POST", "/auth/login", "body { email, password }, reads token"],
+    ["POST", "/auth/register", "body { name, email, password }"],
+    ["GET", "/auth/me", "returns data.user ?? data"],
+    ["POST", "/me/onboarding", "body { occupation, experienceLevel, language }"],
+    ["GET", "/diagnostic/questions", ""],
+    ["POST", "/diagnostic/submit", "body { answers[] }"],
+    ["GET", "/diagnostic/result", "404/204/400/422 mean no result yet"],
+    ["GET", "/api/syllabus", "Level[] or { data: Level[] }"]
+  ],
+  accept: [
+    "No file outside `src/api` contains a URL or imports axios.",
+    "The base URL is read from `EXPO_PUBLIC_API_URL` and the README lists the variable.",
+    "A 401 on any other endpoint clears the token and returns to Login.",
+    "All 8 endpoint functions exist with typed requests and responses."
+  ],
+  notes: [
+    "Phone testing: use your computer's LAN IP (for example `http://192.168.1.20:3000`). Android emulator: `http://10.0.2.2:3000`. The backend must listen on all interfaces, not only localhost.",
+    "React Native is not affected by CORS, so the backend does not need changes for that. Ask the backend owner to confirm it does not depend on cookies or an Origin check."
+  ]
+},
+{ id: "MOB-3", epic: "foundation", title: "Token and local storage", size: "S", deps: ["MOB-1"],
+  why: "The web app keeps the token and some cached data in `localStorage`. Mobile has no `localStorage`, so build one small storage module that replaces it.",
+  steps: [
+    "Create `src/storage/auth-storage.ts` with `getToken`, `setToken`, `clearToken`, using `expo-secure-store` (key `token`).",
+    "Keep an in-memory copy of the token so the axios interceptor does not wait on disk for every request.",
+    "Create `src/storage/diagnostic-storage.ts` with `getDiagnosticResult`, `setDiagnosticResult`, `clearDiagnosticResult` using AsyncStorage (key `diagnostic_result`, stored as JSON).",
+    "Wrap reads in try/catch and return null on failure."
+  ],
+  accept: [
+    "After closing and reopening the app, the token and diagnostic result are still there.",
+    "`clearToken` also clears the in-memory copy.",
+    "No other file touches SecureStore or AsyncStorage directly."
+  ],
+  reuse: ["Web keys: `token`, `diagnostic_result`. Do not port `codelingo_profile`. That key only stored profile edits locally and was never sent to the server."]
+},
+{ id: "MOB-4", epic: "foundation", title: "Theme and assets", size: "S", deps: ["MOB-1"],
+  why: "Give both of you the same colors, spacing and mascot images so screens look like the web app without copying CSS.",
+  steps: [
+    "Create `src/theme/theme.ts` exporting colors, spacing, radii and font sizes.",
+    "Colors from the web app: bg `#09070f`, surface `#0d0a14`, border `#292335`, accent `#8c4ff2`, accent dark `#7438d8`, text `#aaa2bd`, strong text `#f7f4ff`. Primary buttons use a purple gradient from purple-500 to purple-600, which needs `expo-linear-gradient`.",
+    "Fonts: the web app uses system fonts (Avenir Next, Segoe UI). Use the platform default font in React Native, or bundle one font with `expo-font` if you want a custom look.",
+    "Copy the mascot PNGs from web `src/assets/characters/` (happy, hi, excited, confused, crying, sad, thinking, celebrating, strugling) and `src/assets/hero.png` into `src/assets/`.",
+    "Make a small `Mascot` component that takes a mood name and renders the right image with `require()`."
+  ],
+  accept: [
+    "A demo screen shows every mascot image on the dark background.",
+    "All screens read colors from the theme file. No hex values inside screen files.",
+    "The spelling `strugling` is kept in the file name only. The component prop can be `struggling`."
+  ]
+},
+{ id: "MOB-5", epic: "foundation", title: "Port shared types and pure helpers", size: "M", deps: ["MOB-1"],
+  why: "A lot of the web logic is plain TypeScript with no DOM, so it can be copied and reused. Doing this once saves rewriting the normalizers and validation.",
+  steps: [
+    "Copy `src/features/diagnostic/types.ts` (DiagnosticSubmitResponse, DiagnosticLevel, DiagnosticBreakdown).",
+    "Copy `src/features/syllabus/types.ts` (SyllabusLevel, SyllabusTopic, SyllabusConcept, DiagnosticLikeResult).",
+    "Copy the normalizers from `src/features/syllabus/api/get-syllabus.ts`: `normalizeLevel`, `normalizeTopic`, `normalizeConcept`, `extractLevels`. Leave out the axios call and the `localStorage` read, since MOB-2 replaces those.",
+    "Extract from `profile-page.tsx` into their own file: `normalizeDiagnosis`, `normalizeConceptStatus`, `getInitials`, `radarAxisOrder`.",
+    "Copy `validate()` from `register-page.tsx`, and the helpers `normalizeComparableValue`, `formatLevelLabel`, `formatConceptLabel`, `getTopicGlyph`, `languageOptions`.",
+    "Copy `src/mocks/onboarding-data.ts` (all onboarding steps and options)."
+  ],
+  accept: [
+    "All copied files compile with no DOM or `window` references.",
+    "Each helper has one quick unit test or a sample call that proves it works (for example, `getInitials('Ada Lovelace')`).",
+    "No file imports from `react-dom` or TanStack Router."
+  ]
+},
+{ id: "MOB-6", epic: "foundation", title: "Navigation and auth gate", size: "M", deps: ["MOB-2", "MOB-3", "MOB-4"],
+  why: "The web app has no route guard. Every page checks `localStorage` itself, and the syllabus page is not protected. On mobile, decide once at startup which set of screens the user can see.",
+  steps: [
+    "Create an `AuthProvider` with status `loading`, `signedOut` or `signedIn`. On startup it reads the token from storage (MOB-3).",
+    "While `loading`, show a simple splash screen with the mascot.",
+    "Create two native-stack navigators. Signed out: Login, Register. Signed in: Onboarding, Diagnostic, DiagnosticResults, Syllabus, Profile.",
+    "Expose `signIn(token)` and `signOut()` from the provider. `signOut` clears the token and the saved diagnostic result.",
+    "Register the provider's `signOut` as the `onUnauthorized` callback from MOB-2.",
+    "Define a typed param list so DiagnosticResults receives the result object as a route param."
+  ],
+  accept: [
+    "A logged-out user cannot open any signed-in screen.",
+    "A logged-in user opening the app skips Login.",
+    "Forcing a 401 (delete the token on the server or edit it) sends the user back to Login.",
+    "Navigation params are typed."
+  ],
+  notes: ["The web app passes the diagnostic result through router history state, with `localStorage` as a fallback. On mobile, pass it as a route param and also save it with MOB-3, so it survives a restart."]
+},
+{ id: "MOB-7", epic: "auth", title: "Login screen", size: "M", deps: ["MOB-6"],
+  why: "Entry point for returning users. Matches the web login page without the dead social buttons.",
+  steps: [
+    "Fields: email (email keyboard, no auto-capitalize) and password (secure text entry).",
+    "On submit call `login` from MOB-2 with `{ email, password }`.",
+    "Read `res.data.token`, store it through `signIn(token)`, then continue to the next screen (see MOB-9 for where).",
+    "On failure show the message `Login failed`. Show the server's `message` if it sends one.",
+    "Disable the button and show a spinner while the request runs.",
+    "Add a link to Register."
+  ],
+  api: [["POST", "/auth/login", "body { email, password }"]],
+  accept: [
+    "A valid login stores the token and leaves the Login screen.",
+    "A wrong password shows an error and keeps the user on Login (no logout loop).",
+    "Double tapping the button sends only one request.",
+    "The keyboard does not cover the form on a small phone."
+  ],
+  notes: ["The web login page shows GitHub and Google buttons that do nothing. Leave them out. They are tracked as MOB-B1."]
+},
+{ id: "MOB-8", epic: "auth", title: "Register screen", size: "M", deps: ["MOB-6"],
+  why: "Lets a new user create an account. Reuses the web validation rules.",
+  steps: [
+    "Fields: name, email, password.",
+    "Use the ported `validate()` from MOB-5: name and email required, password at least 8 characters. Show errors under each field.",
+    "Trim values before sending, as the web app does.",
+    "On submit call `register` with `{ name, email, password }`.",
+    "On failure show `response.data.message` if present, otherwise `Registration failed.`",
+    "On success show a short toast or banner (not a browser-style alert) and navigate to Login."
+  ],
+  api: [["POST", "/auth/register", "body { name, email, password }"]],
+  accept: [
+    "Each validation rule shows an error on the right field.",
+    "A server error (for example duplicate email) is shown.",
+    "A success message appears and the user lands on Login."
+  ],
+  notes: ["The web app does not log the user in after registering. You can add that later if the register response includes a token, but confirm the response shape first."]
+},
+{ id: "MOB-9", epic: "auth", title: "After-login routing and logout", size: "M", deps: ["MOB-7", "MOB-11"],
+  why: "The web app always sends users to Onboarding after login, even returning users, and has no logout at all. Mobile needs a sensible route after login and a way to sign out.",
+  steps: [
+    "Ask the backend owner whether the user object from `/auth/me` says if onboarding or the diagnostic is done. If yes, use that to choose the screen.",
+    "If the backend cannot say, use this fallback after login: call `getDiagnosticResult`. If a result comes back, go to Syllabus. If it returns 404, 204, 400 or 422, go to Onboarding.",
+    "Add a Logout button on the Profile screen (and anywhere else you see fit) that calls `signOut()`.",
+    "Confirm logout clears the token and the saved diagnostic result, and returns to Login with no back button to signed-in screens."
+  ],
+  accept: [
+    "A brand new user goes Register, Login, Onboarding, Diagnostic.",
+    "A returning user who finished the diagnostic lands on Syllabus.",
+    "Logout works and cannot be undone with the Android back button."
+  ],
+  notes: ["The fallback is a suggestion that uses only existing endpoints. It is not how the web app behaves today."]
+},
+{ id: "MOB-10", epic: "flow", title: "Onboarding flow", size: "L", deps: ["MOB-5", "MOB-6"],
+  why: "Seven steps that collect the user's background and chosen language before the diagnostic.",
+  steps: [
+    "Build the flow from the copied `onboarding-data.ts`: welcome, mascot messages, three question screens, then the ready screen.",
+    "Show step dots at the top and a mascot with a speech bubble on message steps.",
+    "Question screens show option cards. Continue stays disabled until one option is chosen.",
+    "Java and JavaScript options show a Coming soon chip and cannot be selected. Only Python works.",
+    "On the final step, call `saveOnboarding` once with `{ occupation, experienceLevel, language }`.",
+    "On failure, show an inline message that it could not be saved and let the user tap again to retry.",
+    "On success, navigate to the Diagnostic screen."
+  ],
+  api: [["POST", "/me/onboarding", "occupation: STUDENT | PROFESSIONAL | HOBBYIST. experienceLevel: STUDENT | BEGINNER | SOME_EXPERIENCE | EXPERIENCED. language: PYTHON | JAVA | JAVASCRIPT."]],
+  accept: [
+    "The request body uses exactly the allowed enum values.",
+    "Back moves to the previous step and keeps earlier answers.",
+    "A failed save can be retried without losing answers.",
+    "Coming soon options are visibly disabled."
+  ]
+},
+{ id: "MOB-11", epic: "flow", title: "Diagnostic quiz", size: "L", deps: ["MOB-10"],
+  why: "A 15-question placement quiz, one question at a time. The backend grades it and picks a level, so the app only collects answers and shows the response.",
+  steps: [
+    "On open, call `getDiagnosticQuestions`. Show a loading state.",
+    "Show one question at a time: prompt, options as radio rows, a progress bar, and Back, Next and Finish buttons.",
+    "Keep answers in local state as an array in question order.",
+    "Finish is disabled until all 15 questions have an answer.",
+    "On Finish, call `submitDiagnostic` with `{ answers: [{ questionId, selectedOptionIndex }] }` in question order.",
+    "On success, save the result with MOB-3 and navigate to DiagnosticResults with the result as a param.",
+    "On network failure when loading, show an error screen with a Retry button that re-runs the request. On an empty list show No diagnostic questions.",
+    "On submit failure, show an inline error and keep all answers filled in."
+  ],
+  api: [
+    ["GET", "/diagnostic/questions", "returns { questions: [{ id, conceptSlug, difficulty, prompt, options[] }] }"],
+    ["POST", "/diagnostic/submit", "returns score, totalQuestions, percentage, level, review, startingSyllabusLevel, breakdown"]
+  ],
+  accept: [
+    "All 15 questions can be answered, changed with Back, and submitted.",
+    "Retry works for both the load error and the submit error.",
+    "Answer order sent to the server matches question order.",
+    "Closing and reopening the app after submit still shows the saved result."
+  ],
+  notes: ["Do not use `window.location.reload()` for Retry like the web app. Just call the fetch again."]
+},
+{ id: "MOB-12", epic: "flow", title: "Diagnostic results screen", size: "M", deps: ["MOB-11"],
+  why: "Shows the user how they did and where they will start. No API call: it renders the result from MOB-11.",
+  steps: [
+    "Read the result from route params. If missing, read it from storage (MOB-3). If still missing, show an empty state with a button back to the diagnostic.",
+    "Score hero: `score` out of `totalQuestions` and `percentage`.",
+    "Level badge from `level` using `formatLevelLabel`.",
+    "AI review block showing the `review` text.",
+    "Concept breakdown list from `breakdown`: one row per concept slug with `correct / total`, labeled with `formatConceptLabel`.",
+    "A Start Learning button that goes to Syllabus."
+  ],
+  accept: [
+    "The screen renders correctly from params and from saved storage.",
+    "Long review text scrolls and does not get cut off.",
+    "The empty state appears when no result exists."
+  ]
+},
+{ id: "MOB-13", epic: "learn", title: "Syllabus browser", size: "L", deps: ["MOB-5", "MOB-12"],
+  why: "The home screen after the diagnostic: levels, topics and concepts, with the user's recommended level marked.",
+  steps: [
+    "On open, call `getSyllabus`. The response is either `Level[]` or `{ data: Level[] }`, so use the ported `extractLevels` and normalizers.",
+    "Show levels as a horizontal tab strip. Under it, show the topic list for the selected level, then the concept detail for the selected topic. Select the first topic by default.",
+    "Mark the recommended level with a star. First try to match `startingSyllabusLevel.id` from the diagnostic result to a level id. If that finds nothing, use the web fallback: lowercase and strip punctuation, compare the diagnostic level against each level's name, title, description and id, and finally fall back to the first level.",
+    "Add loading, an error screen with Retry, and an empty state: No syllabus content yet.",
+    "Show a Start button on topics and concepts only if it does something. Today it does nothing on the web, so hide or disable it until lessons exist (MOB-B3).",
+    "Use a bottom tab bar or simple header links for Syllabus and Profile. Leave out the decorative web sidebar items (Practice, Projects, Ranks) until those features exist."
+  ],
+  api: [["GET", "/api/syllabus", "Level[] or { data: Level[] }"]],
+  accept: [
+    "Switching levels and topics updates the lists without a new request.",
+    "The correct level is starred for each diagnostic level.",
+    "Retry works after a network failure.",
+    "No button on the screen does nothing when tapped."
+  ],
+  notes: ["The web app matches the recommended level by comparing text, which breaks if the backend changes a title. Prefer the id match and keep the text match only as a fallback."]
+},
+{ id: "MOB-14", epic: "learn", title: "Profile screen", size: "L", deps: ["MOB-5", "MOB-9"],
+  why: "Shows who the user is and how they did on the diagnostic, including the skill radar.",
+  steps: [
+    "Call `getMe` (use `data.user ?? data`). Show avatar initials from `getInitials`, name, email and language.",
+    "Call `getDiagnosticResult`. A 404, 204, 400 or 422 means no diagnostic yet, so show a prompt to take it. Anything else that fails shows the same prompt.",
+    "Run the response through `normalizeDiagnosis`. Show the level, an insight banner and the concept breakdown with a status of Strong, Developing or Weak.",
+    "Draw the skill radar with `react-native-svg`: 6 fixed axes from `radarAxisOrder`, concept scores clamped from 0 to 5.",
+    "Show a Logout button (MOB-9).",
+    "Show the profile as read-only. Do not copy the web edit form."
+  ],
+  api: [
+    ["GET", "/auth/me", "name, email, language"],
+    ["GET", "/diagnostic/result", "shape uncertain, see MOB-2"]
+  ],
+  accept: [
+    "The no-diagnostic state and the has-diagnostic state both look correct.",
+    "The radar renders at phone width with all 6 labels visible.",
+    "A bad token returns the user to Login through the shared 401 handling."
+  ],
+  notes: [
+    "The web app saves profile edits only to `localStorage`, never to the server. Do not copy that. Editing waits for a real `PATCH /me` (MOB-B2).",
+    "The web app shows a hardcoded `8 XP` badge. Leave it out until XP exists (MOB-B4)."
+  ]
+},
+{ id: "MOB-15", epic: "wrap", title: "Walkthrough and README", size: "S", deps: ["MOB-14"],
+  why: "Prove the whole path works on a real device and leave notes so the project is easy to run again.",
+  steps: [
+    "On one real phone or emulator, go through: register, login, onboarding, diagnostic, results, syllabus, profile, logout.",
+    "Also test: wrong password, killing the app and reopening, and turning off the network on a load screen.",
+    "Write a README with setup steps, the env variable `EXPO_PUBLIC_API_URL`, how to reach the backend from a phone, and the list of known gaps.",
+    "Write a short list of backend work still needed for the Blocked tickets and share it with the backend owner."
+  ],
+  accept: [
+    "Every step above works and any bug found has been fixed or written down.",
+    "A new person can run the app from the README alone."
+  ]
+},
+{ id: "MOB-B1", epic: "blocked", title: "Social login (GitHub and Google)", size: "M", deps: [], blocked: true,
+  why: "The web login page shows these buttons with no handlers and no backend endpoints.",
+  needs: "OAuth start and callback endpoints on the backend, and a decision: native sign-in or a web-based flow."
+},
+{ id: "MOB-B2", epic: "blocked", title: "Edit profile", size: "M", deps: ["MOB-14"], blocked: true,
+  why: "The web edit form saves only to local storage. The planned ticket expects a server update.",
+  needs: "A `PATCH /me` or `PUT /me` endpoint and a decision on which fields can be edited."
+},
+{ id: "MOB-B3", epic: "blocked", title: "Lessons and exercises", size: "L", deps: ["MOB-13"], blocked: true,
+  why: "The Start buttons in the syllabus do nothing on the web. No lesson or practice screens exist.",
+  needs: "Lesson and practice-quiz endpoints (web plan tickets SYL-11 to SYL-16, and SYL-18 for practice)."
+},
+{ id: "MOB-B4", epic: "blocked", title: "XP, streaks and leaderboard", size: "L", deps: ["MOB-B3"], blocked: true,
+  why: "Only a hardcoded 8 XP badge exists on the web. There is no progress logic anywhere.",
+  needs: "Progress, XP and streak endpoints (web plan ticket SYL-14)."
+},
+{ id: "MOB-B5", epic: "blocked", title: "Code editor and code execution", size: "L", deps: ["MOB-B3"], blocked: true,
+  why: "Nothing exists on the web: no editor, no sandbox, no run-code endpoint.",
+  needs: "A product decision on how code is written and checked, then a backend execution service. Mobile editor options differ from the web (Monaco does not run in React Native)."
+},
+{ id: "MOB-B6", epic: "blocked", title: "Token refresh, password reset, push notifications", size: "L", deps: [], blocked: true,
+  why: "The web app has no token expiry handling, no forgot-password flow and no notifications.",
+  needs: "Refresh token and password reset endpoints, plus device-token registration for push notifications."
+}
+];
+
+var STORE_KEY = "codelingo-mobile-done";
+var done = {};
+try { done = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; } catch (e) { done = {}; }
+function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(done)); } catch (e) {} }
+
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function fmt(s) { return esc(s).replace(/`([^`]+)`/g, "<code>$1</code>"); }
+function list(cls, items, ordered) {
+  var tag = ordered ? "ol" : "ul";
+  return "<" + tag + (cls ? ' class="' + cls + '"' : "") + ">" + items.map(function (i) { return "<li>" + fmt(i) + "</li>"; }).join("") + "</" + tag + ">";
+}
+function sizeLabel(s) { return s === "S" ? "Small, about half a day" : s === "M" ? "Medium, about 1 day" : "Large, 2 days or more"; }
+
+function ticketHTML(t) {
+  var meta = '<div class="meta"><span class="pill" title="' + sizeLabel(t.size) + '">Size ' + t.size + "</span>";
+  if (t.deps && t.deps.length) meta += '<span class="pill">After ' + t.deps.join(", ") + "</span>";
+  if (t.blocked) meta += '<span class="pill warn">Blocked</span>';
+  meta += '<span class="pill good done-pill" hidden>Done</span></div>';
+
+  var body = '<div class="block"><h4>What and why</h4><p>' + fmt(t.why) + "</p></div>";
+  if (t.needs) body += '<div class="block warnbox"><h4>Needs before starting</h4><p>' + fmt(t.needs) + "</p></div>";
+  if (t.steps) body += '<div class="block"><h4>Steps</h4>' + list("", t.steps, true) + "</div>";
+  if (t.api) body += '<div class="block"><h4>Backend calls</h4><div class="apis">' + t.api.map(function (a) {
+    return '<div><span class="verb">' + a[0] + '</span><span class="m">' + esc(a[1]) + "</span>" + (a[2] ? " <span style='color:var(--muted)'>" + fmt(a[2]) + "</span>" : "") + "</div>";
+  }).join("") + "</div></div>";
+  if (t.accept) body += '<div class="block"><h4>Done when</h4>' + list("check", t.accept) + "</div>";
+  if (t.reuse) body += '<div class="block"><h4>From the web app</h4>' + list("plain", t.reuse) + "</div>";
+  if (t.notes) body += '<div class="block warnbox"><h4>Watch out</h4>' + list("plain", t.notes) + "</div>";
+
+  var foot = "";
+  if (!t.blocked) {
+    foot = '<div class="foot"><label class="donelabel"><input type="checkbox" class="donebox" id="done-' + t.id + '" data-id="' + t.id + '"> Mark as done</label>' +
+      '<button type="button" class="copybtn" data-id="' + t.id + '">Copy for AI</button></div>';
+  } else {
+    foot = '<div class="foot"><span style="font-size:13px;color:var(--muted)">Revisit when the backend work above is finished.</span>' +
+      '<button type="button" class="copybtn" data-id="' + t.id + '">Copy for AI</button></div>';
+  }
+  return '<details class="ticket" id="' + t.id + '" data-epic="' + t.epic + '" open><summary><span class="tid">' + t.id + '</span><span class="ttitle">' + esc(t.title) + "</span>" + meta + '</summary><div class="body">' + body + foot + "</div></details>";
+}
+
+function ticketText(t) {
+  var L = [t.id + ": " + t.title, "Size: " + t.size + (t.deps && t.deps.length ? ". Depends on: " + t.deps.join(", ") : ""), "", "Context: " + t.why];
+  if (t.needs) L.push("", "Needs before starting: " + t.needs);
+  if (t.steps) { L.push("", "Steps:"); t.steps.forEach(function (s, i) { L.push((i + 1) + ". " + s); }); }
+  if (t.api) { L.push("", "Backend calls:"); t.api.forEach(function (a) { L.push("- " + a[0] + " " + a[1] + (a[2] ? " (" + a[2] + ")" : "")); }); }
+  if (t.accept) { L.push("", "Done when:"); t.accept.forEach(function (s) { L.push("- " + s); }); }
+  if (t.reuse) { L.push("", "From the web app:"); t.reuse.forEach(function (s) { L.push("- " + s); }); }
+  if (t.notes) { L.push("", "Watch out:"); t.notes.forEach(function (s) { L.push("- " + s); }); }
+  L.push("", "Project: CodeLingo mobile app, React Native with Expo and TypeScript, same backend as the web app. Use the shared API client from MOB-2 and the theme from MOB-4.");
+  return L.join("\n");
+}
+
+function render() {
+  var out = "";
+  EPICS.forEach(function (e) {
+    var items = T.filter(function (t) { return t.epic === e.id; });
+    out += '<section class="epic" data-epic="' + e.id + '"><div class="epic-head"><h2>' + esc(e.name) + "</h2><p>" + esc(e.note) + "</p></div>" + items.map(ticketHTML).join("") + "</section>";
+  });
+  document.getElementById("epics").innerHTML = out;
+
+  var f = '<button type="button" aria-pressed="true" data-filter="all">All</button>';
+  EPICS.forEach(function (e) { f += '<button type="button" aria-pressed="false" data-filter="' + e.id + '">' + esc(e.name) + "</button>"; });
+  document.getElementById("filters").innerHTML = f;
+
+  var real = T.filter(function (t) { return !t.blocked; }).length;
+  var blocked = T.length - real;
+  document.getElementById("stack").innerHTML = ["Expo + TypeScript", "axios", "React Navigation", real + " tickets", blocked + " blocked"].map(function (s) { return '<span class="chip">' + s + "</span>"; }).join("");
+  syncDone();
+}
+
+function syncDone() {
+  var real = T.filter(function (t) { return !t.blocked; });
+  var n = 0;
+  real.forEach(function (t) {
+    var el = document.getElementById(t.id);
+    var box = document.getElementById("done-" + t.id);
+    var isDone = !!done[t.id];
+    if (isDone) n++;
+    if (box) box.checked = isDone;
+    if (el) {
+      el.classList.toggle("done", isDone);
+      var pill = el.querySelector(".done-pill");
+      if (pill) pill.hidden = !isDone;
+    }
+  });
+  document.getElementById("count").textContent = n + " of " + real.length + " done";
+  document.getElementById("barfill").style.width = Math.round((n / real.length) * 100) + "%";
+}
+
+function copyText(text, btn) {
+  var original = btn.textContent;
+  function ok() { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = original; }, 1400); }
+  function fallback() {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    var good = false;
+    try { good = document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    if (good) ok(); else { btn.textContent = "Select and copy manually"; setTimeout(function () { btn.textContent = original; }, 2000); }
+  }
+  try {
+    navigator.clipboard.writeText(text).then(ok, fallback);
+  } catch (e) { fallback(); }
+}
+
+document.addEventListener("click", function (ev) {
+  var t = ev.target;
+  if (!t || !t.closest) return;
+  var cb = t.closest(".copybtn");
+  if (cb) {
+    var id = cb.getAttribute("data-id");
+    var tk = T.filter(function (x) { return x.id === id; })[0];
+    if (tk) copyText(ticketText(tk), cb);
+    return;
+  }
+  var fb = t.closest("[data-filter]");
+  if (fb) {
+    var val = fb.getAttribute("data-filter");
+    document.querySelectorAll("[data-filter]").forEach(function (b) { b.setAttribute("aria-pressed", b === fb ? "true" : "false"); });
+    document.querySelectorAll(".epic").forEach(function (s) { s.hidden = !(val === "all" || s.getAttribute("data-epic") === val); });
+    return;
+  }
+  if (t.id === "expand") document.querySelectorAll("details.ticket").forEach(function (d) { d.open = true; });
+  if (t.id === "collapse") document.querySelectorAll("details.ticket").forEach(function (d) { d.open = false; });
+});
+document.addEventListener("change", function (ev) {
+  var t = ev.target;
+  if (t && t.classList && t.classList.contains("donebox")) {
+    var id = t.getAttribute("data-id");
+    if (t.checked) done[id] = true; else delete done[id];
+    save(); syncDone();
+  }
+});
+
+render();
+</script>
+
+</body></html>

@@ -9,10 +9,9 @@
   --accent: #b97a24;
   --accent-soft: #f4e6cf;
   --teal: #2c6b5a;
-  --teal-soft: #e2efe9;
-  --backend: #7a4fae;
-  --backend-soft: #ece3f7;
   --danger: #b4432c;
+  --warn: #9a6b16;
+  --warn-soft: #f8ecd3;
   --radius: 8px;
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -30,9 +29,8 @@
     --accent: #e0a850;
     --accent-soft: #3a3221;
     --teal: #6fbba3;
-    --teal-soft: #1c332c;
-    --backend: #b295dd;
-    --backend-soft: #2a2238;
+    --warn: #e0a850;
+    --warn-soft: #3a3221;
   }
 }
 
@@ -46,9 +44,8 @@
   --accent: #e0a850;
   --accent-soft: #3a3221;
   --teal: #6fbba3;
-  --teal-soft: #1c332c;
-  --backend: #b295dd;
-  --backend-soft: #2a2238;
+  --warn: #e0a850;
+  --warn-soft: #3a3221;
 }
 
 * { box-sizing: border-box; }
@@ -216,6 +213,49 @@ h1 {
 .intro-card p { margin: 0 0 10px; }
 .intro-card p:last-child { margin-bottom: 0; }
 .intro-card strong { color: var(--ink); }
+.intro-card h2 {
+  font-family: var(--serif);
+  font-size: 20px;
+  color: var(--ink);
+  margin: 22px 0 10px;
+}
+.intro-card h2:first-child { margin-top: 0; }
+.intro-card h3 { font-size: 15px; margin: 0 0 6px; color: var(--ink); }
+.intro-card code {
+  font-size: 12.5px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.intro-card .callouts,
+.intro-card .split { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 12px; }
+.intro-card .callout {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.intro-card .callout p { font-size: 14px; }
+.intro-card .tablebox { overflow-x: auto; margin-top: 12px; }
+.intro-card table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.intro-card th, .intro-card td {
+  border-bottom: 1px solid var(--line);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.intro-card th { font-family: var(--mono); font-size: 11.5px; font-weight: 500; color: var(--ink-faint); }
+.intro-card .verb {
+  font-family: var(--mono);
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-right: 6px;
+}
+.intro-card .m { font-family: var(--mono); font-size: 12.5px; }
 
 .group-title {
   font-family: var(--mono);
@@ -223,7 +263,12 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ink-faint);
-  margin: 28px 0 12px;
+  margin: 28px 0 6px;
+}
+.group-note {
+  font-size: 13.5px;
+  color: var(--ink-faint);
+  margin: 0 0 12px;
 }
 
 .ticket-grid { display: grid; gap: 12px; }
@@ -280,11 +325,11 @@ h1 {
   border: 1px solid transparent;
   white-space: nowrap;
 }
-.tag.backend { background: var(--backend-soft); color: var(--backend); }
-.tag.frontend { background: var(--teal-soft); color: var(--teal); }
 .tag.depends { background: transparent; border-color: var(--line); color: var(--ink-faint); }
 .tag.depends a { color: var(--accent); text-decoration: none; }
 .tag.depends a:hover { text-decoration: underline; }
+.tag.blocked { background: transparent; border-color: var(--danger); color: var(--danger); }
+.ticket-card .num.blocked { background: var(--danger); }
 
 /* ---------- Ticket detail ---------- */
 .crumb {
@@ -361,21 +406,67 @@ h1 {
   padding: 1px 5px;
   border-radius: 4px;
 }
-.panel.see { background: var(--teal-soft); border-color: color-mix(in srgb, var(--teal) 25%, var(--line)); }
-.panel.see h2 { color: var(--teal); }
+.panel.warn { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 30%, var(--line)); }
+.panel.warn h2 { color: var(--warn); }
+.panel.warn p, .panel.warn li { color: var(--ink); }
 
-.filelist, .dod { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.filelist li {
-  font-family: var(--mono);
-  font-size: 13.5px;
+/* Ordered build steps (mobile tickets) */
+.steps {
+  margin: 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 8px;
   color: var(--ink-soft);
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 7px 10px;
-  overflow-wrap: anywhere;
 }
-.filelist li code { background: none; color: inherit; padding: 0; }
+.steps li::marker { font-family: var(--mono); font-size: 13px; color: var(--ink-faint); }
+
+/* Backend calls (mobile tickets) */
+.apis { display: grid; gap: 8px; }
+.api-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.api-row .verb {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+.api-row .path { font-family: var(--mono); font-size: 13.5px; color: var(--ink); overflow-wrap: anywhere; }
+.api-row .note { font-size: 13.5px; color: var(--ink-soft); }
+.api-row .note code { font-size: 12.5px; }
+
+.notes-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.notes-list li { position: relative; padding-left: 18px; }
+.notes-list li::before {
+  content: "!";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--warn);
+}
+
+.dod.plain li::before { border-color: var(--ink-faint); border-radius: 50%; }
+.dod.plain li::after { display: none; }
+
+.blocked-note {
+  flex: none;
+  align-self: center;
+  margin: 0;
+  max-width: 200px;
+  font-size: 13px;
+  color: var(--ink-faint);
+  text-align: right;
+}
+
+.dod { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .dod li { position: relative; padding-left: 26px; color: var(--ink-soft); }
 .dod li::before {
   content: "";
@@ -397,20 +488,6 @@ h1 {
   border-left: 2px solid var(--teal);
   border-bottom: 2px solid var(--teal);
   transform: rotate(-45deg);
-}
-
-.verify {
-  font-family: var(--mono);
-  font-size: 13.5px;
-  background: #17201d;
-  color: #9fd8c4;
-  border-radius: 6px;
-  padding: 12px 14px;
-  overflow-x: auto;
-  margin: 0;
-}
-@media (prefers-color-scheme: light) {
-  .verify { background: #14211d; }
 }
 
 .pager {
