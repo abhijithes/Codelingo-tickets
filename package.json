@@ -1,0 +1,24 @@
+{
+  "name": "codlingo-tickets",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static site that shares the project tickets as HTML pages",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "check": "astro check",
+    "preview": "astro preview",
+    "import:tickets": "node scripts/import-tickets.mjs"
+  },
+  "dependencies": {
+    "astro": "^6.0.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
+  }
+}
