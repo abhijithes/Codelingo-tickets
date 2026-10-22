@@ -1,0 +1,70 @@
+---
+/**
+ * Shell for the standalone ticket documents. Each one ships as a complete HTML
+ * file with its own styles, so it is injected as-is and only the page head and
+ * the way back are supplied here.
+ */
+interface Props {
+  title: string
+  html: string
+}
+
+const { title, html } = Astro.props
+
+// The documents still carry their own <title> and a throwaway meta tag from the
+// tool that generated them. Drop those so the page head above is the only one.
+const body = html
+  .replace(/<title>[\s\S]*?<\/title>/gi, '')
+  .replace(/<meta\s+name=["']?claude:[^>]*>/gi, '')
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <Fragment set:html={body} />
+
+    <a class="back" href="../">
+      <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M16 10H5M9 5.5 4.5 10 9 14.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      All ticket sets
+    </a>
+  </body>
+</html>
+
+<style is:global>
+  .back {
+    position: fixed;
+    z-index: 40;
+    left: max(14px, env(safe-area-inset-left, 0px));
+    bottom: max(14px, env(safe-area-inset-bottom, 0px));
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 8px rgba(20, 10, 40, 0.12);
+    color: #1d1530;
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+  }
+  .back:hover {
+    background: #ffffff;
+    border-color: rgba(109, 47, 214, 0.5);
+  }
+  .back:focus-visible {
+    outline: 2px solid #6d2fd6;
+    outline-offset: 2px;
+  }
+</style>

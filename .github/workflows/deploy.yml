@@ -17,6 +17,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # The site is served from https://abhijithes.github.io/Codelingo-tickets/
+      BASE_PATH: /Codelingo-tickets
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

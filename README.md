@@ -1,16 +1,17 @@
 # Codlingo Tickets
 
-A small **Astro** site that shares the CodeLingo **mobile app** build tickets as standalone
-HTML pages — the mobile ticket list is the landing page, and every ticket has its own page
-so it can be opened or shared as a plain URL.
+A small **Astro** site that shares the CodeLingo build tickets as standalone HTML pages.
+The landing page is a hub with two ticket sets — the **mobile app** rebuild and the **web
+lesson feature** work — and each set is one page that can be opened or shared as a plain URL.
 
 ## Source of truth
 
-Tickets are imported from `CodeLingo Mobile Tickets.html`. The page keeps its tickets in
-JavaScript data arrays (`EPICS`, `T`) inside its `<script>`, so the importer evaluates that
-data instead of scraping markup. Each ticket carries `steps`, `api` (backend calls), `needs`,
-`reuse`, `notes` and a `blocked` flag. Blocked tickets are listed but have no done-checkbox
-and are excluded from the progress count.
+Each set is authored as a single HTML document in `src/` and served as-is on its own route:
+`CodeLingo-Mobile-Tickets.html` at `/mobile/` and `CodeLingo Lesson Tickets.html` at
+`/lessons/`. Both keep their tickets in JavaScript data arrays inside a `<script>`, which is
+why `scripts/import-tickets.mjs` evaluates that data instead of scraping markup. Each mobile
+ticket carries `steps`, `api` (backend calls), `needs`, `reuse`, `notes` and a `blocked` flag;
+blocked tickets are listed but have no done-checkbox and are excluded from the progress count.
 
 ```bash
 npm run import:tickets   # regenerates src/data/tickets.json from that file
@@ -32,8 +33,10 @@ npm run import:tickets   # regenerates src/data/tickets.json from that file
 scripts/import-tickets.mjs   parses the mobile page's JS data into JSON
 src/data/index.ts            typed accessors (batches, tickets, groups, helpers)
 src/layouts/Base.astro       page shell (header, footer, fonts, tokens)
-src/pages/index.astro        mobile ticket listing + progress bar
-src/pages/tickets/[id].astro one static page per ticket
+src/layouts/TicketPage.astro shell for a ticket document + link back to the hub
+src/pages/index.astro        landing hub, links to both ticket sets
+src/pages/mobile.astro       mobile ticket set  -> /mobile/
+src/pages/lessons.astro      lesson ticket set  -> /lessons/
 src/styles/global.css        design tokens shared with the CodeLingo ticket pages
 ```
 

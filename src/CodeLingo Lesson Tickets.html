@@ -1,0 +1,773 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CodeLingo Lesson Tickets</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column, sticky filter bar, expandable ticket cards grouped by epic. */
+:root {
+  --bg: #f6f4fb;
+  --surface: #ffffff;
+  --surface-2: #efebf8;
+  --line: #ddd6ee;
+  --fg: #1d1530;
+  --muted: #5f5678;
+  --accent: #6d2fd6;
+  --accent-ink: #ffffff;
+  --accent-soft: #ece3fc;
+  --good: #17703f;
+  --good-soft: #def3e7;
+  --warn: #8f5200;
+  --warn-soft: #fcefd5;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d0a16; --surface: #151024; --surface-2: #1d1630; --line: #2d2545;
+    --fg: #f1edfb; --muted: #a79fbf; --accent: #a77bf5; --accent-ink: #130a26;
+    --accent-soft: #251a40; --good: #5ad19a; --good-soft: #12291f;
+    --warn: #f0b45a; --warn-soft: #2b2112; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d0a16; --surface: #151024; --surface-2: #1d1630; --line: #2d2545;
+  --fg: #f1edfb; --muted: #a79fbf; --accent: #a77bf5; --accent-ink: #130a26;
+  --accent-soft: #251a40; --good: #5ad19a; --good-soft: #12291f;
+  --warn: #f0b45a; --warn-soft: #2b2112; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 56px;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--bg);
+}
+.wrap { max-width: 860px; margin: 0 auto; }
+code {
+  font-family: var(--font-mono); font-size: 0.86em;
+  background: var(--surface-2); border: 1px solid var(--line);
+  padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;
+}
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Header */
+header { padding-top: 40px; display: grid; gap: 14px; }
+.kicker {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent);
+}
+h1 {
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, 7vw, 52px);
+  line-height: 1.05; margin: 0; letter-spacing: -0.02em; text-wrap: balance;
+}
+.lede { color: var(--muted); max-width: 62ch; margin: 0; font-size: 16px; }
+.stack {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;
+}
+.chip {
+  font-family: var(--font-mono); font-size: 12px; padding: 3px 9px;
+  border: 1px solid var(--line); border-radius: 99px; background: var(--surface); color: var(--muted);
+}
+
+/* Sections */
+h2 {
+  font-family: var(--font-display); font-size: 24px; line-height: 1.2; margin: 0;
+  letter-spacing: -0.01em; text-wrap: balance;
+}
+.section { margin-top: 44px; display: grid; gap: 16px; }
+.section > p { margin: 0; color: var(--muted); max-width: 66ch; }
+
+.callouts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.callout {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 16px; display: grid; gap: 6px; align-content: start; min-width: 0;
+}
+.callout h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.callout p { margin: 0; color: var(--muted); font-size: 14px; }
+
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 13.5px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th {
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);
+  background: var(--surface-2); font-weight: 600;
+}
+tr:last-child td { border-bottom: 0; }
+.m { font-family: var(--font-mono); font-size: 12.5px; }
+.verb {
+  font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; padding: 1px 6px;
+  border-radius: 4px; background: var(--accent-soft); color: var(--accent); margin-right: 6px;
+}
+
+/* Toolbar */
+.toolbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  margin-top: 40px; padding-block: 12px; border-bottom: 1px solid var(--line);
+  display: grid; gap: 10px;
+}
+.toolrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+button {
+  font: inherit; font-size: 13px; cursor: pointer; color: var(--fg);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 99px; padding: 5px 12px;
+}
+button:hover { border-color: var(--accent); }
+button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.bar { width: 120px; height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; border: 1px solid var(--line); }
+.bar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width 0.25s; }
+.linkbtn { border-radius: 6px; padding: 4px 10px; }
+
+/* Epics and tickets */
+.epic { margin-top: 36px; display: grid; gap: 12px; }
+.epic-head { display: grid; gap: 2px; }
+.epic-head h2 { font-size: 21px; }
+.epic-head p { margin: 0; color: var(--muted); font-size: 14px; }
+
+details.ticket {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0;
+}
+details.ticket[open] > summary { border-bottom: 1px solid var(--line); }
+details.ticket.done { opacity: 0.72; }
+details.ticket.done .ttitle { text-decoration: line-through; text-decoration-thickness: 1px; }
+summary {
+  list-style: none; cursor: pointer; padding: 14px 16px; display: flex; flex-wrap: wrap;
+  gap: 6px 12px; align-items: baseline;
+}
+summary::-webkit-details-marker { display: none; }
+summary::after {
+  content: "+"; margin-left: auto; font-family: var(--font-mono); color: var(--muted); font-size: 18px; line-height: 1;
+}
+details[open] > summary::after { content: "\2212"; }
+.tid { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--accent); }
+.ttitle { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+.pill {
+  font-family: var(--font-mono); font-size: 11.5px; padding: 1px 8px; border-radius: 99px;
+  background: var(--surface-2); color: var(--muted); border: 1px solid var(--line);
+}
+.pill.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.pill.good { background: var(--good-soft); color: var(--good); border-color: transparent; }
+
+.body { padding: 16px; display: grid; gap: 18px; }
+.block { display: grid; gap: 6px; min-width: 0; }
+.block h4 {
+  margin: 0; font-size: 11.5px; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--muted); font-weight: 600;
+}
+.block p { margin: 0; max-width: 68ch; }
+.block ol, .block ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+.block ol { counter-reset: s; }
+.block ol li { white-space: pre-line; counter-increment: s; padding-left: 28px; position: relative; max-width: 70ch; }
+.block ol li::before {
+  content: counter(s); position: absolute; left: 0; top: 1px; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+  font-size: 11.5px; font-family: var(--font-mono); display: grid; place-items: center;
+}
+.block ul.check li { padding-left: 26px; position: relative; max-width: 70ch; }
+.block ul.check li::before {
+  content: ""; position: absolute; left: 1px; top: 4px; width: 13px; height: 13px;
+  border: 1.5px solid var(--accent); border-radius: 3px;
+}
+.block ul.plain li { padding-left: 16px; position: relative; max-width: 70ch; }
+.block ul.plain li::before { content: ""; position: absolute; left: 3px; top: 10px; width: 5px; height: 5px; border-radius: 50%; background: var(--muted); }
+.block.warnbox { background: var(--warn-soft); border-radius: 8px; padding: 12px 14px; }
+.block.warnbox h4 { color: var(--warn); }
+.apis { display: grid; gap: 6px; }
+.apis div { font-size: 14px; }
+.foot {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+  padding-top: 12px; border-top: 1px dashed var(--line);
+}
+.donelabel { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.donelabel input { width: 17px; height: 17px; accent-color: var(--accent); }
+
+.split { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+@media (max-width: 520px) { summary { padding: 12px 14px; } .body { padding: 14px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">CodeLingo / web app</div>
+    <h1>Lesson feature tickets</h1>
+    <p class="lede">Next step for the web app: Duolingo-style lessons. A user opens a lesson from the syllabus, answers short exercises one at a time, gets instant feedback, and earns XP and a streak. Each ticket says what to build, which API calls it uses and how to know it is finished.</p>
+    <div class="stack" id="stack"></div>
+  </header>
+
+  <section class="section">
+    <h2>Before you start</h2>
+    <div class="callouts">
+      <div class="callout">
+        <h3>Agree on the data format first</h3>
+        <p>Both of you depend on the exercise payloads and endpoints in this page. Settle them in LES-3 before coding. The frontend can start with a local mock JSON file while the backend catches up.</p>
+      </div>
+      <div class="callout">
+        <h3>Grading happens on the server</h3>
+        <p>The browser must never receive the correct answers. It sends an answer, and the server replies correct or wrong with an explanation. This is also what keeps XP honest.</p>
+      </div>
+      <div class="callout">
+        <h3>Fix three web problems first</h3>
+        <p>The web app repeats its base URL in 8 places, has no route guard and has no logout. LES-1 and LES-2 fix that so every new lesson call goes through one client.</p>
+      </div>
+      <div class="callout">
+        <h3>Check against your existing plan</h3>
+        <p>Your repo has a plan with tickets SYL-11 to SYL-20 that I have not seen. These tickets overlap it. Merge or renumber as you like. The backend tickets do not assume a specific ORM or framework.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Exercise types in version 1</h2>
+    <p>Every type can be graded exactly, so no AI grading and no code sandbox is needed yet. Writing real code comes later (LES-L1).</p>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Type</th><th>What the user does</th><th>Answer sent to server</th><th>Stored on the server only</th></tr></thead>
+        <tbody>
+          <tr><td class="m">MULTIPLE_CHOICE</td><td>Reads a question and picks one option.</td><td class="m">{ selectedIndex }</td><td class="m">correctIndex</td></tr>
+          <tr><td class="m">PREDICT_OUTPUT</td><td>Reads a code snippet and picks what it prints.</td><td class="m">{ selectedIndex }</td><td class="m">correctIndex</td></tr>
+          <tr><td class="m">FIX_BUG</td><td>Reads broken code and picks the fix.</td><td class="m">{ selectedIndex }</td><td class="m">correctIndex</td></tr>
+          <tr><td class="m">FILL_BLANK</td><td>Taps words from a word bank into blanks in a code snippet.</td><td class="m">{ blanks: { b1: "range" } }</td><td class="m">accepted words per blank</td></tr>
+          <tr><td class="m">ARRANGE_LINES</td><td>Puts shuffled code lines into the right order.</td><td class="m">{ order: ["l3","l1","l2"] }</td><td class="m">correctOrder</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>New and changed endpoints</h2>
+    <p>Existing endpoints stay as they are, except <code>/api/syllabus</code>, which gains lessons. Auth is the same Bearer token.</p>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Endpoint</th><th>Purpose</th><th>Response</th><th>Ticket</th></tr></thead>
+        <tbody>
+          <tr><td><span class="verb">GET</span><span class="m">/api/syllabus</span></td><td>Changed: each topic now lists its lessons with a status.</td><td>Topic gets <code>lessons: [{ id, title, order, status, xpReward }]</code></td><td>LES-8</td></tr>
+          <tr><td><span class="verb">GET</span><span class="m">/lessons/:id</span></td><td>Lesson details and its exercises, without answers.</td><td><code>{ id, title, exercises[] }</code></td><td>LES-5</td></tr>
+          <tr><td><span class="verb">POST</span><span class="m">/lessons/:id/start</span></td><td>Begin a lesson attempt.</td><td><code>{ sessionId }</code></td><td>LES-6</td></tr>
+          <tr><td><span class="verb">POST</span><span class="m">/exercises/:id/check</span></td><td>Grade one answer.</td><td><code>{ correct, explanation, correctAnswer? }</code></td><td>LES-6</td></tr>
+          <tr><td><span class="verb">POST</span><span class="m">/lessons/:id/complete</span></td><td>Finish the attempt, award XP, update streak.</td><td><code>{ xpGained, accuracy, streak, newlyUnlocked[] }</code></td><td>LES-7</td></tr>
+          <tr><td><span class="verb">GET</span><span class="m">/me/progress</span></td><td>Totals for the top bar and profile.</td><td><code>{ totalXp, currentStreak, longestStreak, completedLessonIds[] }</code></td><td>LES-8</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <div class="toolrow">
+      <div class="filters" id="filters" role="group" aria-label="Filter tickets by group"></div>
+      <div class="progress"><span id="count">0 of 0 done</span><span class="bar"><i id="barfill"></i></span></div>
+    </div>
+    <div class="toolrow">
+      <span style="font-size:13px;color:var(--muted)">Tick Done on a ticket to track progress. It is saved in this browser only.</span>
+      <span><button class="linkbtn" id="expand" type="button">Expand all</button> <button class="linkbtn" id="collapse" type="button">Collapse all</button></span>
+    </div>
+  </div>
+
+  <main id="epics"></main>
+
+  <section class="section" id="split">
+    <h2>Suggested split for two people</h2>
+    <div class="split">
+      <div class="callout"><h3>Together first</h3><p>Do LES-1 and LES-2 (web cleanup) and sit down for LES-3 to agree on the schema and payloads. Then split.</p></div>
+      <div class="callout"><h3>Person A: backend</h3><p>LES-5, LES-6, LES-7, LES-8. Seed content (LES-4) can be shared, since writing and checking exercises is easy to split by topic.</p></div>
+      <div class="callout"><h3>Person B: frontend</h3><p>LES-9 to LES-12 against a mock JSON file, then LES-13 and LES-14 once the endpoints are live.</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+var EPICS = [
+  { id: "cleanup", name: "Web cleanup", note: "Small fixes that every lesson ticket depends on." },
+  { id: "backend", name: "Lesson backend", note: "Data, content and endpoints. Grading and XP live here." },
+  { id: "player", name: "Lesson player", note: "The screen where the user answers exercises." },
+  { id: "path", name: "Path and progress", note: "Connect lessons to the syllabus and show XP and streaks." },
+  { id: "polish", name: "Polish", note: "Quality work once the main loop runs." },
+  { id: "later", name: "Later", note: "Good ideas that need the main loop working first." }
+];
+
+var T = [
+{ id: "LES-1", epic: "cleanup", title: "Shared API client for the web app", size: "M", deps: [],
+  why: "The base URL `http://localhost:3000` is repeated in 8 axios calls across 6 files, and there is no shared HTTP layer. Every lesson call would add more copies, so fix it before building anything new.",
+  steps: [
+    "Create `src/api/client.ts` with one axios instance. Base URL from `import.meta.env.VITE_API_URL`, falling back to `http://localhost:3000`. Add `.env.example` with the variable.",
+    "Request interceptor: read `localStorage['token']` and set `Authorization: Bearer <token>` when present.",
+    "Response interceptor: on a 401 from any endpoint except `/auth/login` and `/auth/register`, remove the token and navigate to `/login`.",
+    "Move each existing call into a function in `src/api/`: `login`, `register`, `getMe`, `saveOnboarding`, `getDiagnosticQuestions`, `submitDiagnostic`, `getDiagnosticResult`, `getSyllabus`.",
+    "Replace every direct axios call and hardcoded URL in `login-page.tsx`, `register-page.tsx`, `onboarding-page.tsx`, `diagnostic-page.tsx`, `profile-page.tsx` and `get-syllabus.ts` with these functions."
+  ],
+  accept: [
+    "Searching the repo for `localhost:3000` finds only the fallback in `client.ts`.",
+    "No component imports axios directly.",
+    "Deleting the token on the server and reloading any page sends the user to `/login`.",
+    "Login, register, onboarding, diagnostic, syllabus and profile all still work."
+  ],
+  notes: ["Keep the file free of web-only code where you can. The same client can be copied into the React Native app later."]
+},
+{ id: "LES-2", epic: "cleanup", title: "Route guards, logout and post-login routing", size: "M", deps: ["LES-1"],
+  why: "Today each page checks `localStorage` on its own, the syllabus page is unprotected, there is no logout, and every login goes to `/onboarding` even for returning users.",
+  steps: [
+    "Add a `beforeLoad` guard in TanStack Router for `/onboarding`, `/diagnostic`, `/diagnostic/results`, `/syllabus`, `/profile` and the new `/lesson/$lessonId` route. If there is no token, redirect to `/login`.",
+    "Remove the duplicated token checks from each page.",
+    "Add a Logout button to the profile page. It clears `token`, `diagnostic_result` and `codelingo_profile`, then goes to `/login`.",
+    "After login, call `getDiagnosticResult`. If a result exists, go to `/syllabus`. If it returns 404, 204, 400 or 422, go to `/onboarding`.",
+    "In the sidebar on `/syllabus` and `/profile`, remove or hide the buttons that do nothing (Practice, Projects, Ranks) until those features exist. Keep Learn, Syllabus and Profile."
+  ],
+  api: [["GET", "/diagnostic/result", "used only to decide where to send the user after login"]],
+  accept: [
+    "Opening `/syllabus` while logged out lands on `/login`.",
+    "A user who finished the diagnostic goes straight to `/syllabus` after login.",
+    "A brand new user goes to `/onboarding`.",
+    "Logout works and the back button does not return to a signed-in page."
+  ]
+},
+{ id: "LES-3", epic: "backend", title: "Lesson data model and exercise format", size: "M", deps: [],
+  why: "Everything else builds on this. Decide the tables and the exact JSON shape of each exercise before anyone writes screens or endpoints. Do this one together.",
+  steps: [
+    "Create a `Lesson` table: `id`, `topicId` (links to the existing syllabus topic), `title`, `slug`, `order`, `xpReward` (default 10), `estimatedMinutes`.",
+    "Create an `Exercise` table: `id`, `lessonId`, `order`, `type` (enum from the types table above), `conceptSlug` (must match the slugs used by the diagnostic), `prompt`, `code` (nullable, the snippet to show), `payload` (JSON, see below), `explanation`.",
+    "Create `LessonSession`: `id`, `userId`, `lessonId`, `startedAt`, `completedAt` (nullable).",
+    "Create `ExerciseAttempt`: `id`, `sessionId`, `exerciseId`, `userId`, `correct`, `answer` (JSON), `createdAt`.",
+    "Create `UserLessonProgress`: `userId`, `lessonId`, `status` (`AVAILABLE` or `COMPLETED`), `bestAccuracy`, `completedAt`. Unique on `(userId, lessonId)`.",
+    "Create `UserStats`: `userId`, `totalXp`, `currentStreak`, `longestStreak`, `lastActiveDate`.",
+    "Payload shapes (the `payload` JSON column):\n- MULTIPLE_CHOICE, PREDICT_OUTPUT, FIX_BUG: `{ options: string[], correctIndex: number }`\n- FILL_BLANK: `{ template: 'for i in {{b1}}(5):', bank: ['range','len','print'], blanks: { b1: ['range'] } }`\n- ARRANGE_LINES: `{ lines: [{ id: 'l1', text: 'x = 1' }], correctOrder: ['l1','l2','l3'] }`",
+    "Write the migration and share a sample JSON file for each exercise type with your partner."
+  ],
+  accept: [
+    "Migration runs on a clean database and on your current one.",
+    "A sample exercise of each of the 5 types exists as a JSON file in the repo (for example `docs/exercise-samples.json`).",
+    "Both of you have read and agreed on the payload shapes.",
+    "`conceptSlug` values match the slugs in the diagnostic questions."
+  ],
+  notes: [
+    "Adapt names and types to your ORM. What matters is the fields and the JSON shapes.",
+    "`correctIndex`, `blanks` and `correctOrder` are answers. They are stored here and must never be returned by a read endpoint (LES-5)."
+  ]
+},
+{ id: "LES-4", epic: "backend", title: "Write and seed the first lessons", size: "L", deps: ["LES-3"],
+  why: "Without content there is nothing to test. Start with one level of the syllabus, not all of it. Good lessons are small: 6 to 8 exercises that take about 3 to 5 minutes.",
+  steps: [
+    "Pick the first level in your syllabus (probably Beginner). For each topic in it, plan 2 to 3 lessons.",
+    "Write the lessons as JSON seed files, one file per topic, using the shapes from LES-3. Aim for about 6 to 8 exercises per lesson.",
+    "Each lesson should mix at least 3 exercise types and go from easy to a little harder. Every exercise needs an `explanation` that says why the answer is right in one or two sentences.",
+    "You can draft with AI, but run every code snippet in real Python and check each output yourself. Wrong answers in a learning app lose trust quickly.",
+    "Write a validation script that checks every seed file: required fields present, `correctIndex` is inside `options`, every blank has accepted words, `correctOrder` contains exactly the line ids, and `conceptSlug` exists.",
+    "Write a seed script that inserts lessons and exercises. It must be safe to run twice (update by `slug`, do not duplicate)."
+  ],
+  accept: [
+    "The validation script passes with no errors.",
+    "Seed script run twice gives the same row counts.",
+    "The first level has at least 6 lessons and about 40 exercises in total.",
+    "Each lesson contains at least 3 different exercise types."
+  ],
+  notes: ["Keep exercises short. On a phone and on the web, a code snippet over 8 lines is hard to read in an exercise."]
+},
+{ id: "LES-5", epic: "backend", title: "Read lesson endpoint (no answers)", size: "S", deps: ["LES-3", "LES-4"],
+  why: "The lesson player needs the exercises, but it must not receive the answers.",
+  steps: [
+    "Add `GET /lessons/:id`, protected by the Bearer token.",
+    "Return `{ id, title, xpReward, exercises: [...] }` ordered by `order`.",
+    "For each exercise return `id`, `type`, `prompt`, `code` and only the data needed to answer: `options` for the choice types, `template` and `bank` for FILL_BLANK, `lines` for ARRANGE_LINES. Do not return `explanation` here. It is sent after the answer is checked.",
+    "Strip `correctIndex`, `blanks` (the accepted words) and `correctOrder` from every payload.",
+    "Shuffle `lines` on the server so the order in the response is not the answer.",
+    "Return 404 for an unknown lesson. Return 403 if the lesson is locked for this user (rule in LES-8; until then, allow all)."
+  ],
+  api: [["GET", "/lessons/:id", "returns the lesson and its exercises without any answers"]],
+  accept: [
+    "A test confirms the response JSON contains none of the keys `correctIndex`, `blanks`, `correctOrder` or `explanation`.",
+    "Exercises arrive in the right order.",
+    "ARRANGE_LINES lines are not in the correct order in the response.",
+    "A missing token returns 401."
+  ]
+},
+{ id: "LES-6", epic: "backend", title: "Start lesson and check answer endpoints", size: "M", deps: ["LES-5"],
+  why: "This is the server-side grading. Each answer is checked one at a time so the user gets instant feedback like Duolingo.",
+  steps: [
+    "Add `POST /lessons/:id/start`. It creates a `LessonSession` and returns `{ sessionId }`.",
+    "Add `POST /exercises/:id/check` with body `{ sessionId, answer }`. Check that the session belongs to this user and this exercise's lesson.",
+    "Validate the answer shape for the exercise type, and return 400 if it is wrong.",
+    "Grade: choice types compare `selectedIndex` with `correctIndex`. FILL_BLANK compares each blank, trimmed and case-sensitive (code is case-sensitive), against the accepted list. ARRANGE_LINES compares the order arrays exactly.",
+    "Save an `ExerciseAttempt` row for every check, including repeats.",
+    "Return `{ correct: boolean, explanation: string, correctAnswer?: ... }`. Include `correctAnswer` only when `correct` is false, in the same shape as the answer (for example `{ selectedIndex: 2 }`)."
+  ],
+  api: [
+    ["POST", "/lessons/:id/start", "returns { sessionId }"],
+    ["POST", "/exercises/:id/check", "body { sessionId, answer }, returns { correct, explanation, correctAnswer? }"]
+  ],
+  accept: [
+    "Each of the 5 types has a passing and a failing test.",
+    "A wrong answer returns the correct answer and the explanation. A right answer returns only the explanation.",
+    "Checking with another user's session id fails.",
+    "Every check creates an attempt row."
+  ],
+  notes: ["Retries are allowed. Accuracy (LES-7) counts only the first try for each exercise, so store every attempt."]
+},
+{ id: "LES-7", epic: "backend", title: "Complete lesson, XP and streak", size: "M", deps: ["LES-6"],
+  why: "Finishing a lesson is the reward moment. The server decides the XP and streak so the numbers cannot be faked from the browser.",
+  steps: [
+    "Add `POST /lessons/:id/complete` with body `{ sessionId }`.",
+    "Make sure the session belongs to the user, is not already completed, and that every exercise in the lesson has at least one correct attempt. If not, return 400.",
+    "Accuracy = exercises answered correctly on the first try divided by total exercises.",
+    "XP rules for version 1: first completion gives the lesson's `xpReward` (10), plus 5 bonus XP when accuracy is 100%. Replaying a completed lesson gives 2 XP.",
+    "Streak: compare today with `lastActiveDate`. Same day keeps the streak. The next day adds 1. A longer gap resets it to 1. Update `longestStreak` when beaten.",
+    "Mark the lesson `COMPLETED` in `UserLessonProgress` (keep the best accuracy). Set `completedAt` on the session.",
+    "Return `{ xpGained, accuracy, streak: { current, longest }, newlyUnlocked: [lessonId] }`. Use the unlock rules from LES-8 for `newlyUnlocked`."
+  ],
+  api: [["POST", "/lessons/:id/complete", "body { sessionId }, returns { xpGained, accuracy, streak, newlyUnlocked[] }"]],
+  accept: [
+    "First completion awards the right XP, and a perfect run adds the bonus.",
+    "Replaying gives only 2 XP.",
+    "Completing the same session twice does not award XP twice.",
+    "Unit tests cover the streak cases: same day, next day, and a gap of 2 days."
+  ],
+  notes: ["Version 1 uses the server's UTC date for streaks. A user in India can see the streak flip at 5:30 am local time. Note this as a known limit, and store a user timezone later."]
+},
+{ id: "LES-8", epic: "backend", title: "Lesson status in syllabus and progress endpoint", size: "M", deps: ["LES-7"],
+  why: "The syllabus page needs to know which lessons are open, done or locked, and the top bar needs the user's XP and streak.",
+  steps: [
+    "Extend `GET /api/syllabus`: each topic gets `lessons: [{ id, title, order, xpReward, status }]` with `status` one of `LOCKED`, `AVAILABLE`, `COMPLETED`.",
+    "Unlock rules: inside a topic, lessons unlock in order (lesson 1 is open, lesson 2 opens when lesson 1 is completed). Topics in a level unlock in order too. Levels below the user's starting level (from the diagnostic) are fully open. The starting level is open from its first topic. Levels above it stay locked until the level before is completed.",
+    "Enforce the same rules in `GET /lessons/:id` and `POST /lessons/:id/start` (return 403 when locked).",
+    "Add `GET /me/progress` returning `{ totalXp, currentStreak, longestStreak, completedLessonIds }`.",
+    "Keep the existing syllabus fields unchanged so the current syllabus page keeps working."
+  ],
+  api: [
+    ["GET", "/api/syllabus", "adds lessons[] with status to each topic"],
+    ["GET", "/me/progress", "returns { totalXp, currentStreak, longestStreak, completedLessonIds }"]
+  ],
+  accept: [
+    "A new user who starts at Beginner sees only the first lesson open.",
+    "A user whose diagnostic placed them at Intermediate has Beginner lessons open and Intermediate unlocked from its first topic.",
+    "Opening a locked lesson by URL returns 403.",
+    "Completing a lesson changes the next lesson from LOCKED to AVAILABLE in the next syllabus response."
+  ],
+  notes: ["The current web syllabus normalizer is lenient and ignores unknown fields, so adding `lessons` will not break it."]
+},
+{ id: "LES-9", epic: "player", title: "Lesson player screen", size: "L", deps: ["LES-1", "LES-2"],
+  why: "The main screen of the app. It shows one exercise at a time with a progress bar and a bottom bar with the Check and Continue buttons, like Duolingo.",
+  steps: [
+    "Add a route `/lesson/$lessonId`, protected by the guard from LES-2.",
+    "On open, call `GET /lessons/:id` and `POST /lessons/:id/start`. Show a loading state, and an error state with a Retry button that re-runs the calls.",
+    "Layout: top bar with a close button and a progress bar, the exercise in the middle, and a fixed bottom bar.",
+    "State machine: `answering` (Check is disabled until an answer exists), `checked-correct`, `checked-wrong`, then Continue moves to the next exercise.",
+    "Pressing Check calls `POST /exercises/:id/check`. Show a green banner with the explanation when correct, and a red banner with the explanation and the correct answer when wrong. Show the happy or sad mascot in the banner.",
+    "Close button opens an in-page confirmation (not `window.confirm`): Quit lesson or Keep going. Quitting returns to `/syllabus`. Progress is not saved.",
+    "Keyboard: Enter presses Check or Continue.",
+    "Use a shared `ExerciseProps` contract so each exercise type is a separate component: `{ exercise, disabled, result, onAnswerChange(answer | null) }`."
+  ],
+  api: [
+    ["GET", "/lessons/:id", "loads the exercises"],
+    ["POST", "/lessons/:id/start", "gets the sessionId"],
+    ["POST", "/exercises/:id/check", "grades each answer"]
+  ],
+  accept: [
+    "A full lesson can be played with the multiple-choice component from LES-10.",
+    "Check is disabled until an answer is chosen, and exercise inputs are locked after checking.",
+    "The progress bar advances after each Continue.",
+    "Refreshing the page mid-lesson restarts the lesson without errors."
+  ],
+  notes: ["Build this against a local mock JSON file first if the backend is not ready. Match the shapes in LES-3 exactly so swapping in the real API is a one-line change."]
+},
+{ id: "LES-10", epic: "player", title: "Multiple choice, predict output and fix bug exercises", size: "M", deps: ["LES-9"],
+  why: "Three of the five exercise types are the same interaction: pick one option. Build them as one component with different headings.",
+  steps: [
+    "Create `ChoiceExercise` for MULTIPLE_CHOICE, PREDICT_OUTPUT and FIX_BUG. It shows the prompt, an optional code block, and the options as large tappable cards.",
+    "Selecting an option calls `onAnswerChange({ selectedIndex })`. Selecting again changes it.",
+    "After checking, mark the chosen option green or red, and also highlight the correct one when the user was wrong (use `correctAnswer` from the check response).",
+    "Support number keys 1 to 4 for selecting an option.",
+    "Show the code in a monospace block that scrolls sideways on narrow screens. Plain styling for now. Syntax colors come in LES-15."
+  ],
+  accept: [
+    "All three types render and can be answered.",
+    "Colors for right and wrong also have an icon or text, so they do not rely on color alone.",
+    "Code blocks never push the page wider than the screen."
+  ]
+},
+{ id: "LES-11", epic: "player", title: "Fill in the blank and arrange lines exercises", size: "L", deps: ["LES-9"],
+  why: "These two types feel like a game and make coding exercises possible without typing, which also works well on phones later.",
+  steps: [
+    "FILL_BLANK: render the `template` as a code block where each `{{b1}}` becomes an empty slot. Below it show the `bank` as word chips. Tapping a chip fills the next empty slot, tapping a filled slot returns the word to the bank.",
+    "FILL_BLANK answer is `{ blanks: { b1: 'range', ... } }`. Call `onAnswerChange(null)` until every blank is filled.",
+    "ARRANGE_LINES: show the shuffled `lines` as a list. Tapping a line moves it into the answer area, tapping it there moves it back. The answer is `{ order: [ids] }` and is complete when all lines are placed.",
+    "Optional: add drag and drop for reordering inside the answer area. Tap-to-move must work first and stay as the fallback.",
+    "After checking, show which blanks or lines were wrong, and show the correct version using `correctAnswer`."
+  ],
+  accept: [
+    "Both types can be completed with mouse and keyboard (chips are real buttons).",
+    "Check stays disabled until all blanks are filled or all lines are placed.",
+    "The wrong-answer state shows the correct code.",
+    "Layout works at phone width (about 400px)."
+  ],
+  notes: ["Keep indentation visible in ARRANGE_LINES. Python lines with leading spaces are part of the answer, so render them as text with preserved whitespace."]
+},
+{ id: "LES-12", epic: "player", title: "Retry mistakes and lesson complete screen", size: "M", deps: ["LES-7", "LES-10"],
+  why: "Two things make Duolingo lessons feel complete: wrong answers come back at the end, and a celebration screen shows what you earned.",
+  steps: [
+    "When an exercise is answered wrong, add it again to the end of the lesson queue (once per mistake, up to 2 retries). The progress bar counts exercises done, not attempts.",
+    "The lesson ends when the queue is empty. Then call `POST /lessons/:id/complete` with the `sessionId`.",
+    "Show a completion screen: celebrating mascot, XP gained, accuracy as a percentage, current streak, and a list of any lessons that just unlocked.",
+    "Buttons: Continue (back to `/syllabus`) and, if there is a next lesson, Next lesson.",
+    "If the complete call fails, show an error with Retry. Do not lose the result.",
+    "Update the XP and streak shown in the app (LES-14) after completion."
+  ],
+  api: [["POST", "/lessons/:id/complete", "returns { xpGained, accuracy, streak, newlyUnlocked[] }"]],
+  accept: [
+    "A wrong answer reappears at the end and must be answered correctly to finish.",
+    "The complete screen shows the numbers returned by the server, not locally computed ones.",
+    "Reloading the complete screen does not award XP twice."
+  ]
+},
+{ id: "LES-13", epic: "path", title: "Syllabus becomes a learning path", size: "L", deps: ["LES-8", "LES-9"],
+  why: "Today the Start buttons on the syllabus do nothing. This ticket makes the syllabus the way into lessons.",
+  steps: [
+    "Under each topic in the syllabus page, show its lessons as a vertical list or path of nodes with three states: locked (padlock, disabled), available (highlighted), completed (check mark).",
+    "Clicking an available or completed lesson navigates to `/lesson/$lessonId`. Locked lessons show a short message such as Finish the previous lesson to unlock.",
+    "Replace the dead START and START TOPIC buttons: START TOPIC opens the first available lesson in that topic. Hide it when none is available.",
+    "Add a prominent Continue button at the top that opens the next available lesson in the recommended level.",
+    "Fix the recommended level match: first compare `startingSyllabusLevel.id` from the diagnostic result with the level id. Only if that finds nothing, use the existing text comparison.",
+    "Refetch the syllabus when returning from a lesson so statuses are current."
+  ],
+  api: [["GET", "/api/syllabus", "now includes lessons[] with status"]],
+  accept: [
+    "No button on the page does nothing when clicked.",
+    "Completing a lesson unlocks the next one visible on return.",
+    "The Continue button always opens a lesson the user is allowed to play.",
+    "Empty topics (no lessons yet) show a Coming soon label."
+  ]
+},
+{ id: "LES-14", epic: "path", title: "Real XP and streak in the UI", size: "S", deps: ["LES-8", "LES-12"],
+  why: "The profile page shows a hardcoded `8 XP`. Replace it with the real numbers so progress feels real.",
+  steps: [
+    "Add a small `useProgress` hook (or context) that calls `GET /me/progress` once and exposes `totalXp`, `currentStreak`, `longestStreak` and a `refresh()` function.",
+    "Show XP and a streak flame in the top bar of `/syllabus` and `/profile`.",
+    "Show longest streak and completed lesson count on the profile page.",
+    "Call `refresh()` after a lesson is completed (LES-12).",
+    "Remove the hardcoded `8 XP` badge."
+  ],
+  api: [["GET", "/me/progress", "returns { totalXp, currentStreak, longestStreak, completedLessonIds }"]],
+  accept: [
+    "A new user sees 0 XP and a 0 day streak.",
+    "XP and streak update after completing a lesson without a page reload.",
+    "The string `8 XP` no longer exists in the code."
+  ]
+},
+{ id: "LES-15", epic: "polish", title: "Syntax-highlighted code blocks", size: "S", deps: ["LES-10"],
+  why: "Colored code is easier to read and makes the app look professional. All code in exercises should use one shared component.",
+  steps: [
+    "Create a `CodeBlock` component used by every exercise type and by the syllabus concept details.",
+    "Use a small library such as highlight.js (load only the Python grammar) or Shiki. Pick a theme that matches the dark background (`#09070f`) and the purple accent.",
+    "Keep `white-space: pre` so indentation stays correct, and let the block scroll sideways on small screens.",
+    "Replace the plain code styling added in LES-10 and LES-11."
+  ],
+  accept: [
+    "Python keywords, strings and numbers have distinct colors with enough contrast.",
+    "Bundle size grows by only a small amount (check the build output).",
+    "Indentation is preserved exactly."
+  ]
+},
+{ id: "LES-16", epic: "polish", title: "Hearts (optional)", size: "L", deps: ["LES-7", "LES-12"],
+  why: "Duolingo limits mistakes with hearts. It adds tension but also frustration, so treat this as optional and decide as a team whether you want it.",
+  steps: [
+    "Add `hearts` and `heartsUpdatedAt` to `UserStats`. Start at 5.",
+    "Each wrong first attempt in a lesson costs one heart. The check response returns the remaining hearts.",
+    "At 0 hearts the lesson ends with a screen offering to wait or practice. Starting a lesson with 0 hearts returns 403.",
+    "Regenerate one heart every 30 minutes, calculated on the server from `heartsUpdatedAt`.",
+    "Show hearts in the lesson top bar and the app top bar."
+  ],
+  accept: [
+    "Hearts drop on wrong first attempts and not on retries.",
+    "At 0 hearts the user cannot start another lesson until one regenerates.",
+    "Hearts regenerate correctly after closing the app."
+  ],
+  notes: ["For a college demo, hearts can make the app feel blocked while examiners try it. If you build it, add an environment flag to switch it off."]
+},
+{ id: "LES-17", epic: "polish", title: "Tests for grading, unlocking and streaks", size: "M", deps: ["LES-8"],
+  why: "The repo has no tests today. These three areas are the rules of the app and break easily when you change content or code.",
+  steps: [
+    "Backend unit tests for answer checking, one passing and one failing case per exercise type.",
+    "Backend tests for the unlock rules: new user, user placed in a higher level, completing a lesson, completing the last lesson of a topic.",
+    "Backend tests for XP and streak: first completion, perfect bonus, replay, same day, next day, gap.",
+    "A test that the read endpoint never returns answer fields, run against every seeded exercise.",
+    "Add an npm script that runs all tests and run it before every merge."
+  ],
+  accept: [
+    "`npm test` runs and passes on a clean checkout.",
+    "Changing a correct answer in the code makes at least one test fail."
+  ]
+},
+{ id: "LES-L1", epic: "later", title: "Write-the-code exercises with test cases", size: "L", deps: ["LES-17"], blocked: true,
+  why: "The most realistic learning exercise: the user writes a function and it runs against tests.",
+  needs: "A safe way to run user code. The simplest start is Pyodide (Python in the browser through WebAssembly), which avoids running untrusted code on your server. A hosted runner such as Judge0 or Piston is the next option. Add a WRITE_CODE exercise type with test cases in its payload."
+},
+{ id: "LES-L2", epic: "later", title: "Practice mode for weak concepts", size: "M", deps: ["LES-17"], blocked: true,
+  why: "Use the diagnostic breakdown and the stored attempts to build a review session from the concepts the user gets wrong most.",
+  needs: "Enough lessons and attempts stored per `conceptSlug`. Adds the Practice sidebar item back."
+},
+{ id: "LES-L3", epic: "later", title: "Leaderboard (Ranks)", size: "M", deps: ["LES-14"], blocked: true,
+  why: "Weekly XP ranking to add some competition.",
+  needs: "Weekly XP totals per user and a decision on privacy (names or nicknames)."
+},
+{ id: "LES-L4", epic: "later", title: "Daily goal and reminders", size: "M", deps: ["LES-14"], blocked: true,
+  why: "A daily XP goal and a reminder email or notification help the streak habit.",
+  needs: "User setting for the goal, and an email service or push notifications."
+},
+{ id: "LES-L5", epic: "later", title: "Content authoring tool", size: "L", deps: ["LES-17"], blocked: true,
+  why: "A small admin page to write and preview exercises, so content does not need to be edited as JSON files.",
+  needs: "An admin role on users and an editor form for each exercise type."
+},
+{ id: "LES-L6", epic: "later", title: "More levels of lessons", size: "L", deps: ["LES-4"], blocked: true,
+  why: "Repeat the content work for the Elementary, Intermediate and Advanced levels.",
+  needs: "Time. Reuse the validation script from LES-4 to keep quality up."
+}
+];
+
+var STORE_KEY = "codelingo-web-lessons-done";
+var done = {};
+try { done = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; } catch (e) { done = {}; }
+function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(done)); } catch (e) {} }
+
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function fmt(s) { return esc(s).replace(/`([^`]+)`/g, "<code>$1</code>"); }
+function list(cls, items, ordered) {
+  var tag = ordered ? "ol" : "ul";
+  return "<" + tag + (cls ? ' class="' + cls + '"' : "") + ">" + items.map(function (i) { return "<li>" + fmt(i) + "</li>"; }).join("") + "</" + tag + ">";
+}
+function sizeLabel(s) { return s === "S" ? "Small, about half a day" : s === "M" ? "Medium, about 1 day" : "Large, 2 days or more"; }
+
+function ticketHTML(t) {
+  var meta = '<div class="meta"><span class="pill" title="' + sizeLabel(t.size) + '">Size ' + t.size + "</span>";
+  if (t.deps && t.deps.length) meta += '<span class="pill">After ' + t.deps.join(", ") + "</span>";
+  if (t.blocked) meta += '<span class="pill warn">Later</span>';
+  meta += '<span class="pill good done-pill" hidden>Done</span></div>';
+
+  var body = '<div class="block"><h4>What and why</h4><p>' + fmt(t.why) + "</p></div>";
+  if (t.needs) body += '<div class="block warnbox"><h4>Needs first</h4><p>' + fmt(t.needs) + "</p></div>";
+  if (t.steps) body += '<div class="block"><h4>Steps</h4>' + list("", t.steps, true) + "</div>";
+  if (t.api) body += '<div class="block"><h4>Backend calls</h4><div class="apis">' + t.api.map(function (a) {
+    return '<div><span class="verb">' + a[0] + '</span><span class="m">' + esc(a[1]) + "</span>" + (a[2] ? " <span style='color:var(--muted)'>" + fmt(a[2]) + "</span>" : "") + "</div>";
+  }).join("") + "</div></div>";
+  if (t.accept) body += '<div class="block"><h4>Done when</h4>' + list("check", t.accept) + "</div>";
+  if (t.reuse) body += '<div class="block"><h4>From the web app</h4>' + list("plain", t.reuse) + "</div>";
+  if (t.notes) body += '<div class="block warnbox"><h4>Watch out</h4>' + list("plain", t.notes) + "</div>";
+
+  var foot = "";
+  if (!t.blocked) {
+    foot = '<div class="foot"><label class="donelabel"><input type="checkbox" class="donebox" id="done-' + t.id + '" data-id="' + t.id + '"> Mark as done</label>' +
+      '<button type="button" class="copybtn" data-id="' + t.id + '">Copy for AI</button></div>';
+  } else {
+    foot = '<div class="foot"><span style="font-size:13px;color:var(--muted)">Come back to this after the main lesson loop works.</span>' +
+      '<button type="button" class="copybtn" data-id="' + t.id + '">Copy for AI</button></div>';
+  }
+  return '<details class="ticket" id="' + t.id + '" data-epic="' + t.epic + '" open><summary><span class="tid">' + t.id + '</span><span class="ttitle">' + esc(t.title) + "</span>" + meta + '</summary><div class="body">' + body + foot + "</div></details>";
+}
+
+function ticketText(t) {
+  var L = [t.id + ": " + t.title, "Size: " + t.size + (t.deps && t.deps.length ? ". Depends on: " + t.deps.join(", ") : ""), "", "Context: " + t.why];
+  if (t.needs) L.push("", "Needs first: " + t.needs);
+  if (t.steps) { L.push("", "Steps:"); t.steps.forEach(function (s, i) { L.push((i + 1) + ". " + s); }); }
+  if (t.api) { L.push("", "Backend calls:"); t.api.forEach(function (a) { L.push("- " + a[0] + " " + a[1] + (a[2] ? " (" + a[2] + ")" : "")); }); }
+  if (t.accept) { L.push("", "Done when:"); t.accept.forEach(function (s) { L.push("- " + s); }); }
+  if (t.reuse) { L.push("", "From the web app:"); t.reuse.forEach(function (s) { L.push("- " + s); }); }
+  if (t.notes) { L.push("", "Watch out:"); t.notes.forEach(function (s) { L.push("- " + s); }); }
+  L.push("", "Project: CodeLingo web app (React 19, Vite, TypeScript, TanStack Router, axios) with its existing REST backend. Exercise types and endpoints are defined in LES-3 and the lesson ticket page.");
+  return L.join("\n");
+}
+
+function render() {
+  var out = "";
+  EPICS.forEach(function (e) {
+    var items = T.filter(function (t) { return t.epic === e.id; });
+    out += '<section class="epic" data-epic="' + e.id + '"><div class="epic-head"><h2>' + esc(e.name) + "</h2><p>" + esc(e.note) + "</p></div>" + items.map(ticketHTML).join("") + "</section>";
+  });
+  document.getElementById("epics").innerHTML = out;
+
+  var f = '<button type="button" aria-pressed="true" data-filter="all">All</button>';
+  EPICS.forEach(function (e) { f += '<button type="button" aria-pressed="false" data-filter="' + e.id + '">' + esc(e.name) + "</button>"; });
+  document.getElementById("filters").innerHTML = f;
+
+  var real = T.filter(function (t) { return !t.blocked; }).length;
+  var blocked = T.length - real;
+  document.getElementById("stack").innerHTML = ["React 19 + Vite", "TanStack Router", "axios", real + " tickets", blocked + " later"].map(function (s) { return '<span class="chip">' + s + "</span>"; }).join("");
+  syncDone();
+}
+
+function syncDone() {
+  var real = T.filter(function (t) { return !t.blocked; });
+  var n = 0;
+  real.forEach(function (t) {
+    var el = document.getElementById(t.id);
+    var box = document.getElementById("done-" + t.id);
+    var isDone = !!done[t.id];
+    if (isDone) n++;
+    if (box) box.checked = isDone;
+    if (el) {
+      el.classList.toggle("done", isDone);
+      var pill = el.querySelector(".done-pill");
+      if (pill) pill.hidden = !isDone;
+    }
+  });
+  document.getElementById("count").textContent = n + " of " + real.length + " done";
+  document.getElementById("barfill").style.width = Math.round((n / real.length) * 100) + "%";
+}
+
+function copyText(text, btn) {
+  var original = btn.textContent;
+  function ok() { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = original; }, 1400); }
+  function fallback() {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    var good = false;
+    try { good = document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    if (good) ok(); else { btn.textContent = "Select and copy manually"; setTimeout(function () { btn.textContent = original; }, 2000); }
+  }
+  try {
+    navigator.clipboard.writeText(text).then(ok, fallback);
+  } catch (e) { fallback(); }
+}
+
+document.addEventListener("click", function (ev) {
+  var t = ev.target;
+  if (!t || !t.closest) return;
+  var cb = t.closest(".copybtn");
+  if (cb) {
+    var id = cb.getAttribute("data-id");
+    var tk = T.filter(function (x) { return x.id === id; })[0];
+    if (tk) copyText(ticketText(tk), cb);
+    return;
+  }
+  var fb = t.closest("[data-filter]");
+  if (fb) {
+    var val = fb.getAttribute("data-filter");
+    document.querySelectorAll("[data-filter]").forEach(function (b) { b.setAttribute("aria-pressed", b === fb ? "true" : "false"); });
+    document.querySelectorAll(".epic").forEach(function (s) { s.hidden = !(val === "all" || s.getAttribute("data-epic") === val); });
+    return;
+  }
+  if (t.id === "expand") document.querySelectorAll("details.ticket").forEach(function (d) { d.open = true; });
+  if (t.id === "collapse") document.querySelectorAll("details.ticket").forEach(function (d) { d.open = false; });
+});
+document.addEventListener("change", function (ev) {
+  var t = ev.target;
+  if (t && t.classList && t.classList.contains("donebox")) {
+    var id = t.getAttribute("data-id");
+    if (t.checked) done[id] = true; else delete done[id];
+    save(); syncDone();
+  }
+});
+
+render();
+</script>
+
+</body></html>

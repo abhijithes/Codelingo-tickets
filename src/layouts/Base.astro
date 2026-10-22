@@ -19,7 +19,11 @@ const {
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/favicon.svg`}
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -29,7 +33,7 @@ const {
   </head>
   <body>
     <header class="site-head">
-      <a class="brand" href="/">
+      <a class="brand" href="./">
         <span class="mark">CodeLingo</span>
         <span class="sub">/ tickets</span>
       </a>
